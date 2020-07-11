@@ -4,19 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { FarmPageRoutingModule } from './farm-routing.module';
+import { FarmItemDetailPageRoutingModule } from './farm-item-detail-routing.module';
 
-import { FarmPage } from './farm.page';
-import { SharedModule } from 'src/app/shared/shared.module';
+import { FarmItemDetailPage } from './farm-item-detail.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    FarmPageRoutingModule,
-    SharedModule
+    FarmItemDetailPageRoutingModule
   ],
-  declarations: [FarmPage]
+  declarations: [FarmItemDetailPage]
 })
-export class FarmPageModule {}
+export class FarmItemDetailPageModule {}

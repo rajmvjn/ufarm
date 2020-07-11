@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { UfarmPageRoutingModule } from './ufarm-routing.module';
 
 import { UfarmPage } from './ufarm.page';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    UfarmPageRoutingModule
+    UfarmPageRoutingModule,
+    SharedModule
   ],
   declarations: [UfarmPage]
 })

@@ -21,16 +21,13 @@ export class AuthPage implements OnInit {
     this.isLogin = !this.isLogin;    
   }
 
-  onSubmit(form: NgForm) {
-    console.log(form);
+  onSubmit(form: NgForm) {    
     this.loadingCtrl.create({message: 'Logging in..', keyboardClose: true}).then(ldingEl => {
       ldingEl.present();
-      setTimeout(()=> {
- 
+      setTimeout(()=> { 
         this.authService.login();
         ldingEl.dismiss();
-        this.navCtrl.navigateForward('/ufarm/farm');
-
+        this.navCtrl.navigateForward('/ufarm/farms/farm');
       },1000);
     });
   }

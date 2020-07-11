@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-farm-category',
@@ -7,8 +7,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FarmCategoryComponent implements OnInit {
 
+  @Output() catgoryChange = new EventEmitter();
+
   constructor() { }
 
   ngOnInit() {}
+
+  private onCatChange(event: CustomEvent) {
+    this.catgoryChange.emit(event);
+  }
 
 }

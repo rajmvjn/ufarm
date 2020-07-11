@@ -7,6 +7,14 @@ const routes: Routes = [
   {
     path: '',
     component: SellPage
+  },
+  {
+    path: 'sell-item-detail',
+    loadChildren: () => import('./sell-item-detail/sell-item-detail.module').then( m => m.SellItemDetailPageModule)
+  },
+  {
+    path: 'add-sell-item',
+    loadChildren: () => import('./add-sell-item/add-sell-item.module').then( m => m.AddSellItemPageModule)
   }
 ];
 

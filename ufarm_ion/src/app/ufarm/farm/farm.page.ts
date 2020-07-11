@@ -12,4 +12,8 @@ export class FarmPage implements OnInit {
   ngOnInit() {
   }
 
+  onCategoryChange(event: CustomEvent) {
+    console.log(event.detail);
+  }
+
 }

@@ -1,9 +1,12 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>farm</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Farm</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <app-farm-category (catgoryChange) = "onCategoryChange($event)"></app-farm-category>
 </ion-content>

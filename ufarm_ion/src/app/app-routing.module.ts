@@ -16,7 +16,7 @@ const routes: Routes = [
     path: 'ufarm',
     loadChildren: () => import('./ufarm/ufarm.module').then( m => m.UfarmPageModule),
     canLoad: [AuthGuard]
-  },
+  }
 ];
 
 @NgModule({
