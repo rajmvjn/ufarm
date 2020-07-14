@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 export class AuthPage implements OnInit {
 
   isLogin = true;
+  isAdmin: boolean;
 
   constructor(private loadingCtrl: LoadingController, private authService: AuthService, private navCtrl: NavController) { }
 
@@ -22,12 +23,18 @@ export class AuthPage implements OnInit {
   }
 
   onSubmit(form: NgForm) {    
+    this.isAdmin = this.authService.is_admin;
     this.loadingCtrl.create({message: 'Logging in..', keyboardClose: true}).then(ldingEl => {
       ldingEl.present();
       setTimeout(()=> { 
         this.authService.login();
         ldingEl.dismiss();
-        this.navCtrl.navigateForward('/ufarm/farms/farm');
+        if(this.isAdmin) {
+          this.navCtrl.navigateForward('/admin/admins/farm');
+        }else {
+          this.navCtrl.navigateForward('/ufarm/farms/farm');
+        }
+        
       },1000);
     });
   }

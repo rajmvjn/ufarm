@@ -16,6 +16,10 @@ const routes: Routes = [
     path: 'ufarm',
     loadChildren: () => import('./ufarm/ufarm.module').then( m => m.UfarmPageModule),
     canLoad: [AuthGuard]
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./admin/admin.module').then( m => m.AdminPageModule)
   }
 ];
 
