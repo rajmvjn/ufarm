@@ -17,10 +17,10 @@ export class CategoryPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.categoriesSub = this.catService.categories.subscribe( cats =>{
-      this.categories = cats;
-      console.log(cats);
+      this.categories = cats;      
     })
   }
+
 
   ngOnDestroy() {
     if(this.categoriesSub) {

@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CategoryService } from '../category.service';
 import { NavController } from '@ionic/angular';
+import { PlaceLocation } from './../../../shared/location.model';
 
 
 function base64toBlob(base64Data, contentType) {
@@ -48,14 +49,21 @@ export class AddCategoryPage implements OnInit {
       }),
       image: new FormControl(null, {
         validators: [Validators.required]
+      }),
+      location: new FormControl(null, {
+        validators: [Validators.required]
       })
     })
   }
 
-  onAddCategory() {   
-    this.catService.addCategory(this.form.value.image);
-    this.navCtrl.navigateBack('/admin/admins/category');
+  onLocationPicked(location: PlaceLocation) {
+    this.form.patchValue({ location: location});
+  }
 
+  onAddCategory() {   
+    this.catService.addCategory(this.form.get('image').value, this.form.value.name, this.form.value.description).subscribe( () => {
+      this.navCtrl.navigateBack('/admin/admins/category');
+    });
   }
 
   onImagePicked(imageData: string | File) {
@@ -73,8 +81,6 @@ export class AddCategoryPage implements OnInit {
     } else {
       imageFile = imageData;
     }
-
-    console.log(imageFile);
 
     this.form.patchValue({ image: imageFile });
   }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Category } from '../category/category.model';
 import { BehaviorSubject } from 'rxjs';
+import { take, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -20,9 +21,12 @@ export class CategoryService {
     return this._categories.asObservable();
   }
 
-  addCategory(imageData) {
-    console.log(imageData);
-    const category = new Category('1', 'EggsNmilk', 'This is for all the eggs and milka', imageData, true);
-    this._categories.next([category]);
+  addCategory(imageData, name: string, description: string) {
+    console.log(typeof imageData);
+    const category = new Category('11', name, description, imageData, true);
+    
+    return this._categories.pipe( take(1), tap( cats => {
+      this._categories.next(cats.concat(category));
+    }))
   }
 }
