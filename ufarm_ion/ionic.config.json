@@ -1,5 +1,7 @@
 {
   "name": "ufarm_ion",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular"
 }

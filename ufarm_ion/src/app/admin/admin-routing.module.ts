@@ -1,61 +1,85 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
 
-import { AdminPage } from './admin.page';
+import { AdminPage } from "./admin.page";
 
 const routes: Routes = [
   {
-    path: 'admins',
+    path: "admins",
     component: AdminPage,
     children: [
       {
-        path: 'farm',
+        path: "farm",
         children: [
           {
-            path: '',
-            loadChildren: () => import('../ufarm/farm/farm.module').then( m => m.FarmPageModule)
-          }
-        ]
+            path: "",
+            loadChildren: () =>
+              import("../ufarm/farm/farm.module").then((m) => m.FarmPageModule),
+          },
+        ],
       },
       {
-        path: 'category',
+        path: "category",
         children: [
           {
-            path: '',
-            loadChildren: () => import('./category/category.module').then( m => m.CategoryPageModule)
-          }
-        ]
+            path: "",
+            loadChildren: () =>
+              import("./category/category.module").then(
+                (m) => m.CategoryPageModule
+              ),
+          },
+          {
+            path: "add-category",
+            loadChildren: () =>
+              import("./category/add-category/add-category.module").then(
+                (m) => m.AddCategoryPageModule
+              ),
+          },
+          {
+            path: "edit/:category_id",
+            loadChildren: () =>
+              import("./category/add-category/add-category.module").then(
+                (m) => m.AddCategoryPageModule
+              ),
+          },
+        ],
       },
       {
-        path: 'farm-support',
+        path: "farm-support",
         children: [
           {
-            path: '',
-            loadChildren: () => import('./farm-support/farm-support.module').then( m => m.FarmSupportPageModule)
-          }
-        ]
+            path: "",
+            loadChildren: () =>
+              import("./farm-support/farm-support.module").then(
+                (m) => m.FarmSupportPageModule
+              ),
+          },
+        ],
       },
       {
-        path: 'seller-activation',
+        path: "seller-activation",
         children: [
           {
-            path: '',
-            loadChildren: () => import('./seller-activation/seller-activation.module').then( m => m.SellerActivationPageModule)
-          }
-        ]
+            path: "",
+            loadChildren: () =>
+              import("./seller-activation/seller-activation.module").then(
+                (m) => m.SellerActivationPageModule
+              ),
+          },
+        ],
       },
       {
-        path: '',
-        redirectTo: '/admin/admins/farm',
-        pathMatch: 'full'
-      }
-    ]
+        path: "",
+        redirectTo: "/admin/admins/farm",
+        pathMatch: "full",
+      },
+    ],
   },
   {
-    path: '',
-    redirectTo: '/admin/admins/farm',
-    pathMatch: 'full'
-  }
+    path: "",
+    redirectTo: "/admin/admins/farm",
+    pathMatch: "full",
+  },
 ];
 
 @NgModule({

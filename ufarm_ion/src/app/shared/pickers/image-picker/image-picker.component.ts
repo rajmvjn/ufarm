@@ -5,42 +5,47 @@ import {
   EventEmitter,
   ViewChild,
   ElementRef,
-  Input
-} from '@angular/core';
+  Input,
+} from "@angular/core";
 import {
   Plugins,
   Capacitor,
   CameraSource,
-  CameraResultType
-} from '@capacitor/core';
-import { Platform } from '@ionic/angular';
+  CameraResultType,
+} from "@capacitor/core";
+import { Platform } from "@ionic/angular";
 
 @Component({
-  selector: 'app-image-picker',
-  templateUrl: './image-picker.component.html',
-  styleUrls: ['./image-picker.component.scss']
+  selector: "app-image-picker",
+  templateUrl: "./image-picker.component.html",
+  styleUrls: ["./image-picker.component.scss"],
 })
 export class ImagePickerComponent implements OnInit {
-  @ViewChild('filePicker', { static: false }) filePickerRef: ElementRef<HTMLInputElement>;
+  @ViewChild("filePicker", { static: false }) filePickerRef: ElementRef<
+    HTMLInputElement
+  >;
   @Output() imagePick = new EventEmitter<string | File>();
-  @Input() showPreview = false;
+  @Input() showPreview = "";
+
   selectedImage: string;
   usePicker = false;
 
   constructor(private platform: Platform) {}
 
   ngOnInit() {
-    
     if (
-      (this.platform.is('mobile') && !this.platform.is('hybrid')) ||
-      this.platform.is('desktop')
+      (this.platform.is("mobile") && !this.platform.is("hybrid")) ||
+      this.platform.is("desktop")
     ) {
       this.usePicker = true;
+    }
+    if (this.showPreview) {
+      this.selectedImage = this.showPreview;
     }
   }
 
   onPickImage() {
-    if (!Capacitor.isPluginAvailable('Camera')) {
+    if (!Capacitor.isPluginAvailable("Camera")) {
       this.filePickerRef.nativeElement.click();
       return;
     }
@@ -49,13 +54,15 @@ export class ImagePickerComponent implements OnInit {
       source: CameraSource.Prompt,
       correctOrientation: true,
       width: 300,
-      resultType: CameraResultType.DataUrl
+      resultType: CameraResultType.DataUrl,
     })
-      .then(image => {
+      .then((image) => {
+        console.log(image);
+
         this.selectedImage = image.dataUrl;
         this.imagePick.emit(image.dataUrl);
       })
-      .catch(error => {        
+      .catch((error) => {
         if (this.usePicker) {
           this.filePickerRef.nativeElement.click();
         }
@@ -70,7 +77,7 @@ export class ImagePickerComponent implements OnInit {
     }
     const fr = new FileReader();
     fr.onload = () => {
-      const dataUrl = fr.result.toString();      
+      const dataUrl = fr.result.toString();
       this.selectedImage = dataUrl;
       this.imagePick.emit(pickedFile);
     };
