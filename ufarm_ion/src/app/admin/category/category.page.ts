@@ -17,6 +17,7 @@ import {
 })
 export class CategoryPage implements OnInit, OnDestroy {
   categories: Category[];
+  isLoading = false;
   private categoriesSub: Subscription;
   private deleteSub: Subscription;
   private fetchaAllSub: Subscription;
@@ -61,9 +62,12 @@ export class CategoryPage implements OnInit, OnDestroy {
     this.navCtrl.navigateForward(`/admin/admins/category/edit/${category_id}`);
   }
 
-  onDelete(category_id: string, slidingItem: IonItemSliding) {
-    slidingItem.close();
-    this.deleteSub = this.catService.deleteCategory(category_id).subscribe();
+  onDelete(category_id: string, slidingItem: IonItemSliding) {    
+    this.isLoading = true;
+    this.deleteSub = this.catService.deleteCategory(category_id).subscribe( () => {
+      this.isLoading = false;
+      slidingItem.close();
+    });
   }
 
   ngOnDestroy() {

@@ -41,12 +41,9 @@ export class CategoryService {
 
     uploadData.append("name", name);
     uploadData.append("description", description);
-    try {
+    if ( typeof(imageData) !== 'string') {      // on edit if the image not changed then its the strin type loaded from server
       uploadData.append("category_image", imageData, imgName);
-    } catch (error) {
-      console.log(error);
     }
-
     if (editCatId) {
       this.editAddSub = this.htttp.put<any>(
         `${this.BaseURL}v1/category/${editCatId}`,

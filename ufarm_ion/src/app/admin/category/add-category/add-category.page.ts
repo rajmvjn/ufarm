@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { CategoryService } from "../category.service";
-import { NavController } from "@ionic/angular";
+import { NavController, AlertController, LoadingController } from "@ionic/angular";
 import { PlaceLocation } from "./../../../shared/location.model";
 import { ActivatedRoute } from "@angular/router";
 import { environment } from "../../../../environments/environment";
@@ -39,7 +39,8 @@ export class AddCategoryPage implements OnInit {
   constructor(
     private catService: CategoryService,
     private navCtrl: NavController,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private loadingCtrl: LoadingController
   ) {}
 
   ngOnInit() {
@@ -56,6 +57,7 @@ export class AddCategoryPage implements OnInit {
           image = `${environment.BaseURL}images/${cat.img_url}`;
         });
       }
+      //This will later made to asyncrous
       this.form = new FormGroup({
         name: new FormControl(name, {
           updateOn: "blur",
@@ -73,7 +75,9 @@ export class AddCategoryPage implements OnInit {
   }
 
   onAddCategory() {
-    this.catService
+    this.loadingCtrl.create({message: "Processing..", keyboardClose: true}).then( el => {
+      el.present();
+      this.catService
       .addCategory(
         this.form.get("image").value,
         this.form.value.name,
@@ -82,12 +86,13 @@ export class AddCategoryPage implements OnInit {
       )
       .subscribe(() => {
         this.navCtrl.navigateBack("/admin/admins/category");
+        el.dismiss();
       });
+    });    
   }
 
   onImagePicked(imageData: string | File) {
     let imageFile;
-
     if (typeof imageData === "string") {
       try {
         imageFile = base64toBlob(
@@ -100,9 +105,6 @@ export class AddCategoryPage implements OnInit {
     } else {
       imageFile = imageData;
     }
-
-    console.log(typeof imageFile);
-
     this.form.patchValue({ image: imageFile });
   }
 }

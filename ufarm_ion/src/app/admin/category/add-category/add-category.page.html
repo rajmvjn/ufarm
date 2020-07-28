@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/admin/admins/category"></ion-back-button>
     </ion-buttons>
-    <ion-title>Add Category</ion-title>
+  <ion-title>{{editCatId?'Edit':'Add'}} Category</ion-title>
     <ion-buttons slot="primary">
       <ion-button (click)="onAddCategory()" [disabled]="!form.valid">
         <ion-icon name="checkmark" slot="icon-only"></ion-icon>
