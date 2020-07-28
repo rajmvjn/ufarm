@@ -1,13 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import {
-  IsNotEmpty,
-  IsString,
-  IsBoolean,
-  IsOptional,
-  IsDefined,
-  IsNumber,
-} from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsDefined } from 'class-validator';
 
 export class FarmDto {
   @ApiProperty()
@@ -39,12 +32,12 @@ export class FarmDto {
   readonly how_to_farm: string;
 
   @ApiProperty()
-  @IsBoolean()
+  @IsOptional()
   readonly status: boolean;
 
   @ApiProperty()
   @IsOptional()
-  readonly image_url: string;
+  image_url: string;
 
   @ApiProperty()
   @IsOptional()
@@ -55,7 +48,7 @@ export class FarmDto {
   readonly nutrition_fact_image_url: string;
 
   @ApiProperty()
-  @IsNumber()
+  @IsOptional()
   readonly base_price: number;
 
   @ApiProperty()

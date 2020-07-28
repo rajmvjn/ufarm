@@ -1,20 +1,25 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
+import { MulterModule } from '@nestjs/platform-express';
 
 import * as Joi from '@hapi/joi';
 
 import configuration from './config/configuration';
 import { CategoryModule } from './category/category.module';
 import { FarmModule } from './farm/farm.module';
-
+import { AppController } from './app.controller';
 import { UserModule } from './user/user.module';
 import { SellModule } from './sell/sell.module';
 import { CartModule } from './cart/cart.module';
 import config from './config/configuration';
 
 @Module({
+  controllers: [AppController],
   imports: [
+    MulterModule.register({
+      dest: './images',
+    }),
     CategoryModule,
     FarmModule,
     UserModule,

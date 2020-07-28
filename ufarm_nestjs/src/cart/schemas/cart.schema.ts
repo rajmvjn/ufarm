@@ -23,7 +23,10 @@ export class Cart extends Document {
   status: string;
 
   @Prop()
-  date_created: Date;
+  created_on: Date;
+
+  @Prop()
+  updated_on: Date;
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);

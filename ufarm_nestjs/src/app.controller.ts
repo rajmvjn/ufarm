@@ -1,12 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Param, Res } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
+import { Response } from 'express';
+
+import { constants } from './constants';
 
 @Controller()
+@ApiTags('Images')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  /**
+   * Function to get the product image
+   */
+  @Get('images/:imgpath')
+  public getImage(@Param('imgpath') image: string, @Res() res: Response): void {
+    return res.sendFile(image, { root: `./${constants.IMAGE_FOLDER}` });
   }
 }
