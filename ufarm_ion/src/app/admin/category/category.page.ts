@@ -7,6 +7,7 @@ import {
   NavController,
   IonItemSliding,
   LoadingController,
+  AlertController,
 } from "@ionic/angular";
 
 @Component({
@@ -24,7 +25,8 @@ export class CategoryPage implements OnInit, OnDestroy {
   constructor(
     private catService: CategoryService,
     private navCtrl: NavController,
-    private lodingCtrl: LoadingController
+    private lodingCtrl: LoadingController,
+    private alertCtrl: AlertController
   ) {}
 
   ngOnInit() {
@@ -44,6 +46,13 @@ export class CategoryPage implements OnInit, OnDestroy {
                 ldingEl.dismiss();
               }
             );
+          }, (error) => {
+            ldingEl.dismiss();
+            this.alertCtrl.create({
+                header: 'Failure', 
+                message: 'Some error happend try again later', 
+                buttons: ['Ok']})
+              .then(el => el.present());
           });
       });
   }
