@@ -9,9 +9,18 @@ import {
   Res,
   HttpStatus,
   Logger,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiConsumes,
+} from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
+import { diskStorage, MulterFile } from 'multer';
 import { Response } from 'express';
 
 import { CategoryService } from './category.service';
@@ -19,6 +28,11 @@ import { CategoryDto } from './dto/category-dto';
 import { ICategory } from './interfaces/category.interface';
 import { category_module_content } from './category-module-content';
 import { constants } from '../constants';
+import {
+  imageFileFilter,
+  editFileName,
+} from '../shared/utils/file-upload.util';
+import { ApiCategory } from './decorators/category-decorator';
 
 @Controller('v1')
 @ApiTags('Category')
@@ -28,15 +42,31 @@ export class CategoryController {
   /**
    * Function to create new category based on the provided data
    * @param createCategoryDto : CategoryDto
+   * @param file: MulterFile
    * @param response: Response
    */
   @Post('category')
   @ApiOperation({ summary: 'Create category' })
+  @UseInterceptors(
+    FileInterceptor('category_image', {
+      storage: diskStorage({
+        destination: `./${constants.IMAGE_FOLDER}`,
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiCategory('category_image')
+  @ApiOperation({ summary: 'Create category' })
   @ApiResponse({ status: HttpStatus.CREATED, type: CategoryDto })
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public async createCategory(
     @Body() createCategoryDto: CategoryDto,
+    @UploadedFile() catImage: MulterFile,
     @Res() response: Response,
   ): Promise<Response> {
+    createCategoryDto.img_url = catImage.filename;
     return this.categoryService
       .createCategory(createCategoryDto)
       .then(catCreateResponse => {
@@ -47,6 +77,8 @@ export class CategoryController {
         return response.status(HttpStatus.CREATED).send({
           success: true,
           message: category_module_content.category_add_success_message,
+          _id: catCreateResponse['_id'],
+          img_url: catCreateResponse.img_url,
         });
       });
   }
@@ -57,12 +89,27 @@ export class CategoryController {
    * @param categoryId: string
    */
   @Put('category/:categoryId')
+  @UseInterceptors(
+    FileInterceptor('category_image', {
+      storage: diskStorage({
+        destination: `./${constants.IMAGE_FOLDER}`,
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiCategory('category_image')
   @ApiOperation({ summary: 'Update Category based on provided category Id' })
   @ApiResponse({ status: HttpStatus.OK, type: CategoryDto })
   public async updateCategory(
     @Body() updateCategoryDto: CategoryDto,
+    @UploadedFile() catImage: MulterFile,
     @Param('categoryId') categoryId: string,
   ): Promise<ICategory> {
+    if (catImage) {
+      updateCategoryDto.img_url = catImage.filename;
+    }
     return this.categoryService.updateCategory(updateCategoryDto, categoryId);
   }
 

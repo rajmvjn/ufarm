@@ -7,5 +7,6 @@ export interface ICart extends mongoose.Document {
   sell_user_id: string;
   buy_user_id: string;
   status: string;
-  date_created: Date;
+  created_on: Date;
+  updated_on: Date;
 }

@@ -11,10 +11,13 @@ export class Category extends Document {
   name: string;
 
   @Prop()
-  status: boolean;
+  status: string;
 
   @Prop()
   img_url: string;
+
+  @Prop()
+  description: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsNotEmpty, IsString, IsBoolean, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class CategoryDto {
   @ApiProperty()
@@ -13,10 +13,14 @@ export class CategoryDto {
   readonly name: string;
 
   @ApiProperty()
-  @IsBoolean()
-  readonly status: boolean;
+  @IsOptional()
+  readonly status: string;
 
   @ApiProperty()
   @IsOptional()
-  readonly img_url: string;
+  img_url: string;
+
+  @ApiProperty()
+  @IsOptional()
+  readonly description: string;
 }

@@ -9,8 +9,18 @@ import {
   Res,
   HttpStatus,
   Logger,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiConsumes,
+} from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+import { diskStorage, MulterFile } from 'multer';
 
 import { Response } from 'express';
 
@@ -21,6 +31,11 @@ import { IFarm } from './interfaces/farm.interface';
 import { IFarmSupport } from './interfaces/farm-support.interface';
 import { farm_module_content } from './farm-module-content';
 import { constants } from '../constants';
+import {
+  imageFileFilter,
+  editFileName,
+} from '../shared/utils/file-upload.util';
+import { ApiFarmProduct } from './decorators/farm-product.decorator';
 
 @Controller('v1')
 export class FarmController {
@@ -29,16 +44,30 @@ export class FarmController {
   /**
    * Function to create new farm request based on the provided data
    * @param createFarmProductDto : FarmDto
+   * @param file: MulterFile
    * @param response: Response
    */
   @Post('farm-product')
   @ApiTags('Farm')
   @ApiOperation({ summary: 'Create Farm product' })
+  @UseInterceptors(
+    FileInterceptor('product_image', {
+      storage: diskStorage({
+        destination: './images',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiFarmProduct('product_image')
   @ApiResponse({ status: HttpStatus.CREATED, description: constants.created })
   public async createFarmProduct(
     @Body() createFarmProductDto: FarmDto,
+    @UploadedFile() productImage: MulterFile,
     @Res() response: Response,
   ): Promise<Response> {
+    createFarmProductDto.image_url = productImage.filename;
     return this.farmService
       .createFarmProduct(createFarmProductDto)
       .then(frmRqCreateResponse => {

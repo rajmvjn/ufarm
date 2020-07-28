@@ -44,5 +44,9 @@ export class CartDto {
 
   @ApiProperty()
   @IsOptional()
-  readonly date_created: Date;
+  readonly created_on: Date;
+
+  @ApiProperty()
+  @IsOptional()
+  readonly updated_on: Date;
 }
