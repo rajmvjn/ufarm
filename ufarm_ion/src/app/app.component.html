@@ -8,10 +8,12 @@
       </ion-toolbar>
     </ion-header>
       <ion-list>
-        <ion-item>
-          <ion-label> Rajesh Viayan </ion-label>
-          <ion-icon name="person-circle-outline"></ion-icon>
-        </ion-item>
+        <ion-menu-toggle>
+          <ion-item routerLink="/profile">
+            <ion-label> Rajesh Viayan </ion-label>
+            <ion-icon name="person-circle-outline"></ion-icon>
+          </ion-item>
+        </ion-menu-toggle>
         <ion-menu-toggle>
             <ion-item lines="none" routerLink="/ufarm/farms/farm">
               <ion-icon name="business" slot="start"></ion-icon>

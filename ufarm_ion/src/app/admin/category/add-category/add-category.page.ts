@@ -87,7 +87,7 @@ export class AddCategoryPage implements OnInit {
       .subscribe(() => {
         this.navCtrl.navigateBack("/admin/admins/category");
         el.dismiss();
-      });
+      }, );
     });    
   }
 
