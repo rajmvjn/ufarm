@@ -38,23 +38,26 @@ export class CategoryPage implements OnInit, OnDestroy {
       })
       .then((ldingEl) => {
         ldingEl.present();
-        this.fetchaAllSub = this.catService
-          .fetchAllCategories()
-          .subscribe(() => {
+        this.fetchaAllSub = this.catService.fetchAllCategories().subscribe(
+          () => {
             this.categoriesSub = this.catService.categories.subscribe(
               (cats) => {
                 this.categories = cats;
                 ldingEl.dismiss();
               }
             );
-          }, (error) => {
+          },
+          (error) => {
             ldingEl.dismiss();
-            this.alertCtrl.create({
-                header: 'Failure', 
-                message: 'Some error happend try again later', 
-                buttons: ['Ok']})
-              .then(el => el.present());
-          });
+            this.alertCtrl
+              .create({
+                header: "Failure",
+                message: "Some error happend try again later",
+                buttons: ["Ok"],
+              })
+              .then((el) => el.present());
+          }
+        );
       });
   }
 
@@ -62,12 +65,14 @@ export class CategoryPage implements OnInit, OnDestroy {
     this.navCtrl.navigateForward(`/admin/admins/category/edit/${category_id}`);
   }
 
-  onDelete(category_id: string, slidingItem: IonItemSliding) {    
+  onDelete(category_id: string, slidingItem: IonItemSliding) {
     this.isLoading = true;
-    this.deleteSub = this.catService.deleteCategory(category_id).subscribe( () => {
-      this.isLoading = false;
-      slidingItem.close();
-    });
+    this.deleteSub = this.catService
+      .deleteCategory(category_id)
+      .subscribe(() => {
+        this.isLoading = false;
+        slidingItem.close();
+      });
   }
 
   ngOnDestroy() {

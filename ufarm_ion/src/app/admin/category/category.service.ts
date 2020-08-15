@@ -41,7 +41,8 @@ export class CategoryService {
 
     uploadData.append("name", name);
     uploadData.append("description", description);
-    if ( typeof(imageData) !== 'string') {      // on edit if the image not changed then its the strin type loaded from server
+    if (typeof imageData !== "string") {
+      // on edit if the image not changed then its the strin type loaded from server
       uploadData.append("category_image", imageData, imgName);
     }
     if (editCatId) {
@@ -64,14 +65,7 @@ export class CategoryService {
       }),
       take(1),
       tap((cats) => {
-        const category = new Category(
-          "11",
-          name,
-          description,
-          imgURL,
-          true,
-          _id
-        );
+        const category = new Category(name, description, imgURL, true, _id);
         if (editCatId) {
           cats.map((cat) => {
             if (cat._id === _id) {
