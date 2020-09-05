@@ -5,5 +5,118 @@
 </ion-header>
 
 <ion-content>
+  <form [formGroup]="sellForm">
+    <ion-grid>
+      <ion-row>
+        <ion-col class="ion-padding-vertical">
+          <ion-item>
+            <ion-label position="floating">
+              Name
+            </ion-label>
+            <ion-input type="text" formControlName="name"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
 
+      <ion-row>
+        <ion-col class="ion-padding-vertical">
+          <ion-item>
+            <ion-label position="floating">
+              Category
+            </ion-label>
+            <ion-input type="text" formControlName="category_id"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col class="ion-padding-vertical">
+          <ion-item>
+            <ion-label position="floating">
+              Search Farm
+            </ion-label>
+            <ion-input type="Search"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col class="ion-padding-vertical">
+          <ion-item>
+            <ion-label position="floating">
+              Description
+            </ion-label>
+            <ion-input type="text" formControlName="description"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col class="ion-padding-vertical">
+          <ion-item>
+            <ion-label position="floating">
+              Quantity
+            </ion-label>
+            <ion-input
+              type="number"
+              formControlName="quantity_available"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col class="ion-padding-vertical">
+          <ion-item>
+            <ion-label position="floating">
+              Price
+            </ion-label>
+            <ion-input type="number" formControlName="price"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col class="ion-padding-vertical">
+          <ion-item>
+            <ion-label position="floating">
+              Unit
+            </ion-label>
+            <ion-input type="text" formControlName="unit"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col class="ion-padding-vertical">
+          <ion-item>
+            <ion-label position="floating">
+              Unit Value
+            </ion-label>
+            <ion-input type="number" formControlName="unit_value"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col class="ion-padding-vertical">
+          <ion-item>
+            <ion-label position="floating">
+              Offer Price
+            </ion-label>
+            <ion-input type="number" formControlName="offer_price"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row *ngIf="!isProfileLoaded">
+        <ion-col class="ion-padding-vertical">
+          <app-image-picker
+            [showPreview]="profileForm.get('image_url').value"
+            (imagePick)="onImagePicked($event);"
+          ></app-image-picker>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
 </ion-content>

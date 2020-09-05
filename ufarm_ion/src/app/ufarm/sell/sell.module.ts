@@ -1,20 +1,21 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
-import { IonicModule } from '@ionic/angular';
+import { IonicModule } from "@ionic/angular";
 
-import { SellPageRoutingModule } from './sell-routing.module';
+import { SellPageRoutingModule } from "./sell-routing.module";
 
-import { SellPage } from './sell.page';
+import { SellPage } from "./sell.page";
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    SellPageRoutingModule
+    SellPageRoutingModule,
+    ReactiveFormsModule,
   ],
-  declarations: [SellPage]
+  declarations: [SellPage],
 })
 export class SellPageModule {}

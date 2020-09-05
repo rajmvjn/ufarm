@@ -32,10 +32,10 @@ export class User extends Document {
   date_created: Date;
 
   @Prop()
-  sell: boolean;
+  sell?: boolean;
 
   @Prop()
-  admin: boolean;
+  admin?: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
