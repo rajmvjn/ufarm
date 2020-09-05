@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
 @Component({
-  selector: 'app-sell',
-  templateUrl: './sell.page.html',
-  styleUrls: ['./sell.page.scss'],
+  selector: "app-sell",
+  templateUrl: "./sell.page.html",
+  styleUrls: ["./sell.page.scss"],
 })
 export class SellPage implements OnInit {
+  constructor() {}
 
-  constructor() { }
+  ngOnInit() {}
 
-  ngOnInit() {
+  onCategoryChange(event: CustomEvent) {
+    console.log(event.detail);
   }
-
 }

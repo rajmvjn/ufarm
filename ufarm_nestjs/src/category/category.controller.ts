@@ -66,7 +66,7 @@ export class CategoryController {
     @UploadedFile() catImage: MulterFile,
     @Res() response: Response,
   ): Promise<Response> {
-    createCategoryDto.img_url = catImage.filename;
+    createCategoryDto.image_url = catImage.filename;
     return this.categoryService
       .createCategory(createCategoryDto)
       .then(catCreateResponse => {
@@ -78,7 +78,7 @@ export class CategoryController {
           success: true,
           message: category_module_content.category_add_success_message,
           _id: catCreateResponse['_id'],
-          img_url: catCreateResponse.img_url,
+          image_url: catCreateResponse.image_url,
         });
       });
   }
@@ -108,7 +108,7 @@ export class CategoryController {
     @Param('categoryId') categoryId: string,
   ): Promise<ICategory> {
     if (catImage) {
-      updateCategoryDto.img_url = catImage.filename;
+      updateCategoryDto.image_url = catImage.filename;
     }
     return this.categoryService.updateCategory(updateCategoryDto, categoryId);
   }

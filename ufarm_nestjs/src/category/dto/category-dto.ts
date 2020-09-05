@@ -18,7 +18,7 @@ export class CategoryDto {
 
   @ApiProperty()
   @IsOptional()
-  img_url: string;
+  image_url: string;
 
   @ApiProperty()
   @IsOptional()

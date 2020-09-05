@@ -17,7 +17,7 @@
           <ion-item-sliding *ngFor="let category of categories" #slidingItem>
             <ion-item (click)="onEdit(category._id)" lines="none">
               <ion-thumbnail slot="start">
-                <ion-img src="{{imgURL+category.img_url}}"></ion-img>
+                <ion-img src="{{ imgUrl + category.image_url }}"></ion-img>
               </ion-thumbnail>
               <ion-label>
                 <h1>{{ category.name }}</h1>
@@ -33,7 +33,11 @@
                 color="secondary"
                 (click)="onDelete(category._id, slidingItem)"
               >
-                <ion-icon *ngIf="!isLoading" name="trash-outline" slot="icon-only"></ion-icon>
+                <ion-icon
+                  *ngIf="!isLoading"
+                  name="trash-outline"
+                  slot="icon-only"
+                ></ion-icon>
                 <ion-spinner *ngIf="isLoading" name="lines-small"></ion-spinner>
               </ion-item-option>
             </ion-item-options>

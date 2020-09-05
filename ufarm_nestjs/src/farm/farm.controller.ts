@@ -47,7 +47,7 @@ export class FarmController {
    * @param file: MulterFile
    * @param response: Response
    */
-  @Post('farm-product')
+  @Post('farm')
   @ApiTags('Farm')
   @ApiOperation({ summary: 'Create Farm product' })
   @UseInterceptors(
@@ -76,6 +76,8 @@ export class FarmController {
           JSON.stringify(frmRqCreateResponse),
         );
         return response.status(HttpStatus.CREATED).send({
+          _id: frmRqCreateResponse['_id'],
+          image_url: frmRqCreateResponse['image_url'],
           success: true,
           message: farm_module_content.farm_add_success_message,
         });
@@ -88,12 +90,27 @@ export class FarmController {
    */
   @Put('farm/:farmId')
   @ApiTags('Farm')
+  @UseInterceptors(
+    FileInterceptor('product_image', {
+      storage: diskStorage({
+        destination: './images',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiFarmProduct('product_image')
   @ApiOperation({ summary: 'Update Farm Product' })
   @ApiResponse({ status: HttpStatus.OK, type: FarmDto })
   public async updateFarmProduct(
     @Body() updateFarmProductDto: FarmDto,
+    @UploadedFile() productImage: MulterFile,
     @Param('farmId') farmId: string,
   ): Promise<IFarm> {
+    if (productImage) {
+      updateFarmProductDto.image_url = productImage.filename;
+    }
     return this.farmService.updateFarmProduct(updateFarmProductDto, farmId);
   }
 
@@ -101,7 +118,7 @@ export class FarmController {
    * Function to get all farm Product
    *
    */
-  @Get('farm-products')
+  @Get('farm')
   @ApiTags('Farm')
   @ApiOperation({ summary: 'Get all farm products' })
   @ApiResponse({ status: HttpStatus.OK, type: FarmDto })
@@ -113,7 +130,7 @@ export class FarmController {
    * Function to get farm product by Id
    * @param farmId: string
    */
-  @Get('farm-product/:farmId')
+  @Get('farm/:farmId')
   @ApiTags('Farm')
   @ApiOperation({ summary: 'Get farm product detail by Id' })
   @ApiResponse({ status: HttpStatus.OK, type: FarmDto })
@@ -126,7 +143,7 @@ export class FarmController {
    * @param farmId: string
    * @param response: Response
    */
-  @Delete('farm-request/:farmId')
+  @Delete('farm/:farmId')
   @ApiTags('Farm')
   @ApiOperation({ summary: 'Delete farm product by Id' })
   @ApiResponse({
