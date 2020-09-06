@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { CategoryService } from "../category.service";
 import { NavController, LoadingController } from "@ionic/angular";
 import { ActivatedRoute } from "@angular/router";
+import { Subscription } from "rxjs";
 import { environment } from "../../../../environments/environment";
 import { ImageService } from "../../../shared/services/image.service";
 
@@ -11,8 +12,10 @@ import { ImageService } from "../../../shared/services/image.service";
   templateUrl: "./add-category.page.html",
   styleUrls: ["./add-category.page.scss"],
 })
-export class AddCategoryPage implements OnInit {
+export class AddCategoryPage implements OnInit, OnDestroy {
   editCatId = "";
+  getCatSub: Subscription;
+  addCatSub: Subscription;
   imgUrl = environment.ImagesURL;
 
   form = new FormGroup({
@@ -41,9 +44,11 @@ export class AddCategoryPage implements OnInit {
     this.route.paramMap.subscribe((paramMap) => {
       if (paramMap.has("category_id")) {
         this.editCatId = paramMap.get("category_id");
-        this.catService.getCategory(this.editCatId).subscribe((cat) => {
-          this.form.patchValue({ ...cat });
-        });
+        this.getCatSub = this.catService
+          .getCategory(this.editCatId)
+          .subscribe((cat) => {
+            this.form.patchValue({ ...cat });
+          });
       }
     });
   }
@@ -53,7 +58,7 @@ export class AddCategoryPage implements OnInit {
       .create({ message: "Processing..", keyboardClose: true })
       .then((el) => {
         el.present();
-        this.catService
+        this.addCatSub = this.catService
           .addCategory(
             this.form.value.image_url,
             this.form.value.name,
@@ -82,5 +87,14 @@ export class AddCategoryPage implements OnInit {
       imageFile = imageData;
     }
     this.form.patchValue({ image_url: imageFile });
+  }
+
+  ngOnDestroy() {
+    if (this.getCatSub) {
+      this.getCatSub.unsubscribe();
+    }
+    if (this.addCatSub) {
+      this.addCatSub.unsubscribe();
+    }
   }
 }
