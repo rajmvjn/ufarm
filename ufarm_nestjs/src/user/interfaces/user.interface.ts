@@ -1,7 +1,6 @@
 import * as mongoose from 'mongoose';
 
 export interface IUser extends mongoose.Document {
-  user_id: string;
   name: string;
   phone: string;
   email: string;
@@ -10,6 +9,6 @@ export interface IUser extends mongoose.Document {
   avatar: string;
   status: boolean;
   date_created: Date;
-  sell: boolean;
-  admin: boolean;
+  sell?: boolean;
+  admin?: boolean;
 }

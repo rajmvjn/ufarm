@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsString, IsBoolean, IsOptional, IsDefined } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class UserDto {
   @ApiProperty()
@@ -12,9 +12,7 @@ export class UserDto {
   readonly name: string;
 
   @ApiProperty()
-  @IsDefined()
-  @IsString()
-  readonly phone: string;
+  readonly phone?: number;
 
   @ApiProperty()
   @IsOptional()
@@ -30,17 +28,15 @@ export class UserDto {
 
   @ApiProperty()
   @IsOptional()
-  readonly avatar: string;
+  avatar: string;
 
   @ApiProperty()
   @IsOptional()
   readonly date_created: Date;
 
   @ApiProperty()
-  @IsBoolean()
-  readonly sell: boolean;
+  readonly sell?: boolean;
 
   @ApiProperty()
-  @IsBoolean()
-  readonly admin: boolean;
+  readonly admin?: boolean;
 }

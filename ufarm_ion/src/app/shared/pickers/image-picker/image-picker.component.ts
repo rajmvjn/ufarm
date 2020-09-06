@@ -25,7 +25,8 @@ export class ImagePickerComponent implements OnInit {
     HTMLInputElement
   >;
   @Output() imagePick = new EventEmitter<string | File>();
-  @Input() showPreview;
+  @Input() showPreview: string;
+
   @Input() imageUrl;
 
   selectedImage: string;
@@ -40,6 +41,7 @@ export class ImagePickerComponent implements OnInit {
     ) {
       this.usePicker = true;
     }
+    console.log("this.showPreview", this.showPreview);
     if (this.showPreview) {
       this.selectedImage = this.imageUrl + this.showPreview;
     }

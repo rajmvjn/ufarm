@@ -9,10 +9,19 @@ import {
   Res,
   Logger,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiConsumes,
+} from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { Response } from 'express';
+import { diskStorage, MulterFile } from 'multer';
 
 import { UserService } from './user.service';
 import { UserDto } from './dto/user-dto';
@@ -21,6 +30,11 @@ import { SellerRequestDto } from './dto/seller-request.dto';
 import { ISellerRequest } from './interfaces/seller-request.interface';
 import { user_module_content } from './user-module-content';
 import { constants } from '../constants';
+import {
+  imageFileFilter,
+  editFileName,
+} from '../shared/utils/file-upload.util';
+import { ApiUser } from './decorators/user-decorator';
 
 @Controller('v1')
 export class UserController {
@@ -29,16 +43,30 @@ export class UserController {
   /**
    * Function to create new user based on the provided data
    * @param createUserDto : UserDto
+   * @param profileImage: MulterFile
    * @param response: Response
    */
   @Post('user')
   @ApiTags('User')
   @ApiOperation({ summary: 'Create user' })
+  @UseInterceptors(
+    FileInterceptor('profile_image', {
+      storage: diskStorage({
+        destination: `./${constants.IMAGE_FOLDER}`,
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiUser('profile_image')
   @ApiResponse({ status: HttpStatus.CREATED, description: constants.created })
   public async createUser(
     @Body() createUserDto: UserDto,
+    @UploadedFile() profileImage: MulterFile,
     @Res() response: Response,
   ): Promise<Response> {
+    createUserDto.avatar = profileImage.filename;
     return this.userService
       .createUser(createUserDto)
       .then(createUserResponse => {
@@ -61,11 +89,24 @@ export class UserController {
   @Put('user/:userId')
   @ApiTags('User')
   @ApiOperation({ summary: 'Update user based on user id' })
+  @UseInterceptors(
+    FileInterceptor('profile_image', {
+      storage: diskStorage({
+        destination: `./${constants.IMAGE_FOLDER}`,
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiUser('profile_image')
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
   public async updateUser(
     @Body() updateUserDto: UserDto,
+    @UploadedFile() profileImage: MulterFile,
     @Param('userId') userId: string,
   ): Promise<IUser> {
+    updateUserDto.avatar = profileImage.filename;
     return this.userService.updateUser(updateUserDto, userId);
   }
 
