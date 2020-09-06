@@ -19,13 +19,17 @@ export class CategoryService {
     return this.htttp.get<Category[]>(`${this.BaseURL}v1/categories`).pipe(
       take(1),
       tap((cats) => {
-        this._categories.next(cats);
+        this.updateCategories(cats);
       })
     );
   }
 
   get categories() {
     return this._categories.asObservable();
+  }
+
+  private updateCategories(cats: Category[]) {
+    this._categories.next(cats);
   }
 
   addCategory(
@@ -59,7 +63,7 @@ export class CategoryService {
     return this.editAddSub.pipe(
       take(1),
       switchMap((resData) => {
-        imgURL = resData.img_url;
+        imgURL = resData.image_url;
         _id = resData._id;
         return this.categories; // this witches to new observable, new observable returned after http observable
       }),
@@ -67,23 +71,23 @@ export class CategoryService {
       tap((cats) => {
         const category = new Category(name, description, imgURL, true, _id);
         if (editCatId) {
-          cats.map((cat) => {
+          cats.map((cat, index) => {
             if (cat._id === _id) {
               cat.name = name;
               cat.description = description;
-              cat.img_url = imgURL;
+              cat.image_url = imgURL;
             }
           });
-          this._categories.next(cats);
+          this.updateCategories(cats);
         } else {
-          this._categories.next(cats.concat(category));
+          this.updateCategories(cats.concat(category));
         }
       })
     );
   }
 
   getCategory(id: string) {
-    return this._categories.pipe(
+    return this.categories.pipe(
       take(1),
       switchMap((cats) => {
         return cats.filter((cat) => cat._id === id);
@@ -94,12 +98,12 @@ export class CategoryService {
   deleteCategory(cat_id: string) {
     return this.htttp.delete(`${this.BaseURL}v1/category/${cat_id}`).pipe(
       take(1),
-      switchMap((resData) => {
+      switchMap(() => {
         return this.categories;
       }),
       take(1),
       tap((cats) => {
-        this._categories.next(cats.filter((cat) => cat._id !== cat_id));
+        this.updateCategories(cats.filter((cat) => cat._id !== cat_id));
       })
     );
   }

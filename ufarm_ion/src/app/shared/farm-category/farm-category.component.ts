@@ -1,20 +1,40 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  OnDestroy,
+} from "@angular/core";
+import { Subscription } from "rxjs";
+import { Category } from "../../admin/category/category.model";
+import { CategoryService } from "../../admin/category/category.service";
 
 @Component({
-  selector: 'app-farm-category',
-  templateUrl: './farm-category.component.html',
-  styleUrls: ['./farm-category.component.scss'],
+  selector: "app-farm-category",
+  templateUrl: "./farm-category.component.html",
+  styleUrls: ["./farm-category.component.scss"],
 })
-export class FarmCategoryComponent implements OnInit {
+export class FarmCategoryComponent implements OnInit, OnDestroy {
+  categories: Category[];
+  catsSub: Subscription;
 
   @Output() catgoryChange = new EventEmitter();
 
-  constructor() { }
+  constructor(private catService: CategoryService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.catsSub = this.catService.categories.subscribe((cats: Category[]) => {
+      this.categories = cats;
+    });
+  }
 
-  private onCatChange(event: CustomEvent) {
+  onCatChange(event: CustomEvent) {
     this.catgoryChange.emit(event);
   }
 
+  ngOnDestroy() {
+    if (this.catsSub) {
+      this.catsSub.unsubscribe();
+    }
+  }
 }

@@ -31,13 +31,7 @@ export class AddSellItemPage implements OnInit {
   ngOnInit() {
     this.initializeForm();
 
-    this.route.paramMap.subscribe((paramMap) => {
-      //  if (paramMap.has("user_id")) {
-      // this.sellItemId = "5f37bce45ff47e46f4e18072";
-      // this.isProfileLoaded = true;
-      // this.getSellItem(this.profileId);
-      // }
-    });
+    this.route.paramMap.subscribe((paramMap) => {});
   }
 
   initializeForm() {
@@ -48,7 +42,7 @@ export class AddSellItemPage implements OnInit {
         validators: [Validators.required],
       }),
 
-      category: new FormControl(this.formFields.category_id, {
+      category_id: new FormControl(this.formFields.category_id, {
         updateOn: "blur",
         validators: [Validators.required, Validators.maxLength(180)],
       }),

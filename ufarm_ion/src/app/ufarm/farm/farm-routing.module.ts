@@ -1,17 +1,20 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
 
-import { FarmPage } from './farm.page';
+import { FarmPage } from "./farm.page";
 
 const routes: Routes = [
   {
-    path: '',
-    component: FarmPage
+    path: "",
+    component: FarmPage,
   },
   {
-    path: 'farm-item-detail',
-    loadChildren: () => import('./farm-item-detail/farm-item-detail.module').then( m => m.FarmItemDetailPageModule)
-  }
+    path: "farm-item-detail",
+    loadChildren: () =>
+      import("./farm-item-detail/farm-item-detail.module").then(
+        (m) => m.FarmItemDetailPageModule
+      ),
+  },
 ];
 
 @NgModule({

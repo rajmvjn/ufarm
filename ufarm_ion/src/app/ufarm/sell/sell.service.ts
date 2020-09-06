@@ -1,16 +1,20 @@
 import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
 
 import { BehaviorSubject, Observable } from "rxjs";
 import { take, tap, switchMap, map } from "rxjs/operators";
-import { HttpClient } from "@angular/common/http";
+
+import { AutoCompleteService } from "ionic4-auto-complete";
 
 import { SellItem } from "./sell.model";
 import { environment } from "../../../environments/environment";
 
 @Injectable({ providedIn: "root" })
-export class SellService {
+export class SellService implements AutoCompleteService {
   BaseURL = environment.BaseURL;
   private _sellItems = new BehaviorSubject<SellItem[]>([]);
+  labelAttribute = "name";
+  formValueAttribute = "numericCode";
   constructor(private http: HttpClient) {}
 
   get sellItems() {
@@ -44,6 +48,23 @@ export class SellService {
       sell_user_id: "",
       offer_price: 0,
       image_url: "",
+      country: "",
     };
+  }
+
+  getResults(keyword: string) {
+    if (!keyword) {
+      return false;
+    }
+
+    return this.http
+      .get("https://restcountries.eu/rest/v2/name/" + keyword)
+      .pipe(
+        map((result: any[]) => {
+          return result.filter((item) => {
+            return item.name.toLowerCase().startsWith(keyword.toLowerCase());
+          });
+        })
+      );
   }
 }

@@ -2,13 +2,13 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Category } from "./category.model";
 import { CategoryService } from "./category.service";
 import { Subscription } from "rxjs";
-import { environment } from "../../../environments/environment";
 import {
   NavController,
   IonItemSliding,
   LoadingController,
   AlertController,
 } from "@ionic/angular";
+import { environment } from "../../../environments/environment";
 
 @Component({
   selector: "app-category",
@@ -18,10 +18,11 @@ import {
 export class CategoryPage implements OnInit, OnDestroy {
   categories: Category[];
   isLoading = false;
+  imgUrl = environment.ImagesURL;
+
   private categoriesSub: Subscription;
   private deleteSub: Subscription;
   private fetchaAllSub: Subscription;
-  imgURL = `${environment.BaseURL}images/`;
 
   constructor(
     private catService: CategoryService,

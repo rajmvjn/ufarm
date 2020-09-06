@@ -1,20 +1,20 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { IonicModule } from "@ionic/angular";
 
-import { IonicModule } from '@ionic/angular';
-
-import { BuyPageRoutingModule } from './buy-routing.module';
-
-import { BuyPage } from './buy.page';
+import { BuyPageRoutingModule } from "./buy-routing.module";
+import { BuyPage } from "./buy.page";
+import { SharedModule } from "../../shared/shared.module";
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    BuyPageRoutingModule
+    BuyPageRoutingModule,
+    SharedModule,
   ],
-  declarations: [BuyPage]
+  declarations: [BuyPage],
 })
 export class BuyPageModule {}

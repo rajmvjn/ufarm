@@ -1,84 +1,98 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
 
-import { AdminPage } from './admin.page';
+import { AdminPage } from "./admin.page";
 
 const routes: Routes = [
   {
-    path: 'admins',
+    path: "admins",
     component: AdminPage,
     children: [
       {
-        path: 'farm',
+        path: "farm",
         children: [
           {
-            path: '',
+            path: "",
             loadChildren: () =>
-              import('../ufarm/farm/farm.module').then((m) => m.FarmPageModule),
+              import("../ufarm/farm/farm.module").then((m) => m.FarmPageModule),
+          },
+          {
+            path: "add",
+            loadChildren: () =>
+              import(
+                "../ufarm/farm/add-farm-detail/add-farm-detail.module"
+              ).then((m) => m.AddFarmDetailPageModule),
+          },
+          {
+            path: "edit/:_id",
+            loadChildren: () =>
+              import(
+                "../ufarm/farm/add-farm-detail/add-farm-detail.module"
+              ).then((m) => m.AddFarmDetailPageModule),
           },
         ],
       },
       {
-        path: 'category',
+        path: "category",
         children: [
           {
-            path: '',
+            path: "",
             loadChildren: () =>
-              import('./category/category.module').then(
+              import("./category/category.module").then(
                 (m) => m.CategoryPageModule
               ),
           },
           {
-            path: 'add-category',
+            path: "add-category",
             loadChildren: () =>
-              import('./category/add-category/add-category.module').then(
+              import("./category/add-category/add-category.module").then(
                 (m) => m.AddCategoryPageModule
               ),
           },
           {
-            path: 'edit/:category_id',
+            path: "edit/:category_id",
             loadChildren: () =>
-              import('./category/add-category/add-category.module').then(
+              import("./category/add-category/add-category.module").then(
                 (m) => m.AddCategoryPageModule
               ),
           },
         ],
       },
       {
-        path: 'farm-support',
+        path: "farm-support",
         children: [
           {
-            path: '',
+            path: "",
             loadChildren: () =>
-              import('./farm-support/farm-support.module').then(
+              import("./farm-support/farm-support.module").then(
                 (m) => m.FarmSupportPageModule
               ),
           },
         ],
       },
       {
-        path: 'seller-activation',
+        path: "seller-activation",
         children: [
           {
-            path: '',
+            path: "",
             loadChildren: () =>
-              import('./seller-activation/seller-activation.module').then(
+              import("./seller-activation/seller-activation.module").then(
                 (m) => m.SellerActivationPageModule
               ),
           },
         ],
       },
       {
-        path: '',
-        redirectTo: '/admin/admins/farm',
-        pathMatch: 'full',
+        path: "",
+        redirectTo: "/admin/admins/farm",
+        pathMatch: "full",
       },
     ],
   },
   {
-    path: '',
-    redirectTo: '/admin/admins/farm',
-    pathMatch: 'full',
+    path: "",
+    redirectTo: "/admin/admins/farm",
+    pathMatch: "full",
   },
 ];
 

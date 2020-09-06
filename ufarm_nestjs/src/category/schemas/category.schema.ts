@@ -14,7 +14,7 @@ export class Category extends Document {
   status: string;
 
   @Prop()
-  img_url: string;
+  image_url: string;
 
   @Prop()
   description: string;

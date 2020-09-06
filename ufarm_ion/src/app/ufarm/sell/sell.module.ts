@@ -5,8 +5,8 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { IonicModule } from "@ionic/angular";
 
 import { SellPageRoutingModule } from "./sell-routing.module";
-
 import { SellPage } from "./sell.page";
+import { SharedModule } from "../../shared/shared.module";
 
 @NgModule({
   imports: [
@@ -15,6 +15,7 @@ import { SellPage } from "./sell.page";
     IonicModule,
     SellPageRoutingModule,
     ReactiveFormsModule,
+    SharedModule,
   ],
   declarations: [SellPage],
 })

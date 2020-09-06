@@ -1,6 +1,8 @@
-<ion-segment value="veg" (ionChange)="onCatChange($event)">
-  <ion-segment-button value="veg">Veg</ion-segment-button>
-  <ion-segment-button value="fish">Fish</ion-segment-button>
-  <ion-segment-button value="meat">Meat</ion-segment-button>
-  <ion-segment-button value="egsnmilk">EggsNmilk</ion-segment-button>
+<ion-segment
+  [value]="categories.length ? categories[0].name : ''"
+  (ionChange)="onCatChange($event)"
+>
+  <ion-segment-button *ngFor="let cat of categories" [value]="cat.name">
+    {{ cat.name }}</ion-segment-button
+  >
 </ion-segment>

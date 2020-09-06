@@ -4,9 +4,40 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>Farm</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button *ngIf="isAdmin" routerLink="/admin/admins/farm/add">
+        <ion-icon name="add" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <app-farm-category (catgoryChange) = "onCategoryChange($event)"></app-farm-category>
+  <app-farm-category
+    (catgoryChange)="onCategoryChange($event)"
+  ></app-farm-category>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size-sm="8" offset-sm="2">
+        <ion-list>
+          <ion-item-sliding *ngFor="let farmItem of farmItems" #slidingItem>
+            <ion-item lines="none" (click)="onEdit(farmItem._id)">
+              <ion-thumbnail slot="start">
+                <ion-img src="{{imgURL + farmItem.image_url}}"></ion-img>
+              </ion-thumbnail>
+              <ion-label>
+                <h1>{{ farmItem.name }}</h1>
+                <div class="offer-details">
+                  <ion-text color="tertiary" class="space-left"
+                    >{{ farmItem.description }}</ion-text
+                  >
+                </div>
+              </ion-label>
+            </ion-item>
+          </ion-item-sliding>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

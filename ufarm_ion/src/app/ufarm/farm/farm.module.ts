@@ -1,13 +1,13 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
 
-import { IonicModule } from '@ionic/angular';
+import { IonicModule } from "@ionic/angular";
 
-import { FarmPageRoutingModule } from './farm-routing.module';
+import { FarmPageRoutingModule } from "./farm-routing.module";
 
-import { FarmPage } from './farm.page';
-import { SharedModule } from 'src/app/shared/shared.module';
+import { FarmPage } from "./farm.page";
+import { SharedModule } from "../../shared/shared.module";
 
 @NgModule({
   imports: [
@@ -15,8 +15,8 @@ import { SharedModule } from 'src/app/shared/shared.module';
     FormsModule,
     IonicModule,
     FarmPageRoutingModule,
-    SharedModule
+    SharedModule,
   ],
-  declarations: [FarmPage]
+  declarations: [FarmPage],
 })
 export class FarmPageModule {}
