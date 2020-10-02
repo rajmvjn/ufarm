@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { ImageService } from "../../../shared/services/image.service";
+import { ImageService } from "../../../shared/services/image/image.service";
 import { FarmService } from "../farm.service";
 import { NavController } from "@ionic/angular";
 import { ActivatedRoute } from "@angular/router";

@@ -1,9 +1,36 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>seller-activation</ion-title>
+    <ion-title>Users</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <ion-searchbar></ion-searchbar>
 
+  <ion-list>
+    <ion-item *ngFor="let user of users">
+      <ion-avatar slot="start">
+        <img src="{{ imgBaseUrl + user.avatar}}" />
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ user.name }}</h2>
+        <h3>{{user.phone}}</h3>
+        <p>{{user.housename}}</p>
+      </ion-label>
+      <ion-label>Status</ion-label>
+      <ion-toggle
+        name="status"
+        color="success"
+        [checked]="user.status"
+        (ionChange)="onProfileUpdate($event, user._id, false)"
+      ></ion-toggle>
+      <ion-label>Sell</ion-label>
+      <ion-toggle
+        name="sell"
+        color="success"
+        [checked]="user.sell"
+        (ionChange)="onProfileUpdate($event, user._id, true)"
+      ></ion-toggle>
+    </ion-item>
+  </ion-list>
 </ion-content>

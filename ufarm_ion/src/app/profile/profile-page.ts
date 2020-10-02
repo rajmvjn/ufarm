@@ -1,86 +1,93 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { NavController, LoadingController } from "@ionic/angular";
-
-import { ActivatedRoute } from "@angular/router";
+import { NavController } from "@ionic/angular";
 
 import { ProfileService } from "./profile.service";
 import { SharedService } from "../shared/shared-service";
+import { environment } from "../../environments/environment";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: "app-profile",
   templateUrl: "./profile-page.html",
   styleUrls: ["./profile-page.scss"],
 })
-export class ProfilePage implements OnInit {
-  profileForm: FormGroup;
+export class ProfilePage implements OnInit, OnDestroy {
+  password_type = "password";
+  profileSub: Subscription;
   isProfileLoaded: boolean = false;
   profileId: string;
-  formFields = {
-    name: "",
-    phone: "",
-    address: "",
-    pincode: "",
-    avatar: "",
-    email: "",
-  };
+  imageUrl = environment.ImagesURL;
+
+  profileForm = new FormGroup({
+    name: new FormControl(null, {
+      updateOn: "blur",
+      validators: [Validators.required],
+    }),
+    email: new FormControl(null, {
+      updateOn: "blur",
+      validators: [Validators.required],
+    }),
+    password: new FormControl(null, {
+      updateOn: "blur",
+      validators: [Validators.required],
+    }),
+    phone: new FormControl(null, {
+      updateOn: "blur",
+      validators: [Validators.required, Validators.maxLength(180)],
+    }),
+    housename: new FormControl(null, {
+      validators: [Validators.required],
+    }),
+    address: new FormControl(null, {
+      validators: [Validators.required],
+    }),
+    pincode: new FormControl(null, {
+      validators: [Validators.required],
+    }),
+    avatar: new FormControl(null),
+    admin: new FormControl(false),
+    status: new FormControl(true),
+    sell: new FormControl(false),
+    _id: new FormControl(null),
+  });
+
   constructor(
-    private loadingCtrl: LoadingController,
     private profileService: ProfileService,
     private sharedService: SharedService,
-    private navCtrl: NavController,
-    private route: ActivatedRoute
+    private navCtrl: NavController
   ) {}
 
   ngOnInit() {
-    this.initializeForm();
-
-    this.route.paramMap.subscribe((paramMap) => {
-      //  if (paramMap.has("user_id")) {
-      this.profileId = "5f37bce45ff47e46f4e18072";
-      this.isProfileLoaded = true;
-      this.getProfile(this.profileId);
-      // }
-    });
+    console.log("inside profile..");
+    this.profileSub = this.profileService.profile.subscribe(
+      (profile) => {
+        console.log(profile);
+        if (profile) {
+          this.profileForm.patchValue(profile);
+        }
+      },
+      (err) => {
+        console.log(err);
+      },
+      () => {
+        console.log("complted");
+      }
+    );
   }
 
-  initializeForm() {
-    this.profileForm = new FormGroup({
-      name: new FormControl(this.formFields.name, {
-        updateOn: "blur",
-        validators: [Validators.required],
-      }),
-      email: new FormControl(this.formFields.email, {
-        updateOn: "blur",
-        validators: [Validators.required],
-      }),
-      phone: new FormControl(this.formFields.phone, {
-        updateOn: "blur",
-        validators: [Validators.required, Validators.maxLength(180)],
-      }),
-      address: new FormControl(this.formFields.address, {
-        validators: [Validators.required],
-      }),
-      pincode: new FormControl(this.formFields.pincode, {
-        validators: [Validators.required],
-      }),
-      avatar: new FormControl(this.formFields.avatar),
-      _id: new FormControl(""),
-    });
+  onToggleType() {
+    this.password_type = this.password_type === "text" ? "password" : "text";
   }
 
   onProfileUpdate(): void {
-    this.loadingCtrl
-      .create({ message: "Processing..", keyboardClose: true })
-      .then((el) => {
-        el.present();
-        this.profileService
-          .addEditProfile(this.profileForm.value)
-          .subscribe(() => {
-            this.navCtrl.navigateBack("/profile");
-            el.dismiss();
-          });
-      });
+    this.profileService.addEditProfile(this.profileForm.value).subscribe(() => {
+      this.onNavigateback();
+    });
+  }
+
+  onNavigateback() {
+    this.navCtrl.pop();
   }
 
   onImagePicked(imageData: string | File) {
@@ -89,17 +96,15 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  getProfile(id: string) {
-    this.loadingCtrl
-      .create({ message: "Processing..", keyboardClose: true })
-      .then((el) => {
-        el.present();
-        this.profileService.getProfile(id).subscribe((profile) => {
-          this.isProfileLoaded = false;
-          console.log("profile", profile);
-          this.profileForm.patchValue(profile);
-          el.dismiss();
-        });
-      });
+  onLocationPicked(address: any) {
+    this.profileForm.patchValue({ address: address });
+  }
+
+  ngOnDestroy() {
+    console.log("profile destroyy..");
+
+    if (this.profileSub) {
+      this.profileSub.unsubscribe();
+    }
   }
 }

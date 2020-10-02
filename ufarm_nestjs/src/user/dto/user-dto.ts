@@ -24,6 +24,14 @@ export class UserDto {
 
   @ApiProperty()
   @IsOptional()
+  readonly housename: string;
+
+  @ApiProperty()
+  @IsOptional()
+  readonly password: string;
+
+  @ApiProperty()
+  @IsOptional()
   readonly pincode: number;
 
   @ApiProperty()

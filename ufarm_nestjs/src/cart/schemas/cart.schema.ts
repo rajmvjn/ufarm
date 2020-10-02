@@ -8,9 +8,6 @@ export class Cart extends Document {
   cart_id: string;
 
   @Prop()
-  item_id: string;
-
-  @Prop()
   quantity: number;
 
   @Prop()

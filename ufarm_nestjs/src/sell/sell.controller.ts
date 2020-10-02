@@ -47,6 +47,8 @@ export class SellController {
         return response.status(HttpStatus.CREATED).send({
           success: true,
           message: sell_module_content.sell_add_success_message,
+          _id: createSellResponse['_id'],
+          image_url: createSellResponse.image_url,
         });
       });
   }
@@ -70,7 +72,7 @@ export class SellController {
    * Function to get all items
    *
    */
-  @Get('items')
+  @Get('sell')
   @ApiOperation({ summary: 'Get all items' })
   @ApiResponse({ status: HttpStatus.OK, type: SellDto })
   public async getAll(): Promise<ISell[]> {
@@ -93,7 +95,7 @@ export class SellController {
    * @param itemId: string
    * @param response: Response
    */
-  @Delete('item/:itemId')
+  @Delete('sell/:itemId')
   @ApiOperation({ summary: 'Delete item by Id' })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,

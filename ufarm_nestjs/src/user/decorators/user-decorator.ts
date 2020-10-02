@@ -30,11 +30,20 @@ export const ApiUser = (fileName: string): MethodDecorator => (
           format: 'text',
           default: '',
         },
+        password: {
+          type: 'string',
+          format: 'text',
+          default: '',
+        },
         avatar: {
           type: 'string',
           format: 'text',
         },
         address: {
+          type: 'string',
+          format: 'text',
+        },
+        housename: {
           type: 'string',
           format: 'text',
         },

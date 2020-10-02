@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { CategoryService } from "../category.service";
-import { NavController, LoadingController } from "@ionic/angular";
+import { NavController } from "@ionic/angular";
 import { ActivatedRoute } from "@angular/router";
 import { Subscription } from "rxjs";
 import { environment } from "../../../../environments/environment";
-import { ImageService } from "../../../shared/services/image.service";
+import { ImageService } from "../../../shared/services/image/image.service";
 
 @Component({
   selector: "app-add-category",
@@ -36,7 +36,6 @@ export class AddCategoryPage implements OnInit, OnDestroy {
     private catService: CategoryService,
     private navCtrl: NavController,
     private route: ActivatedRoute,
-    private loadingCtrl: LoadingController,
     private imgService: ImageService
   ) {}
 
@@ -54,21 +53,15 @@ export class AddCategoryPage implements OnInit, OnDestroy {
   }
 
   onAddCategory() {
-    this.loadingCtrl
-      .create({ message: "Processing..", keyboardClose: true })
-      .then((el) => {
-        el.present();
-        this.addCatSub = this.catService
-          .addCategory(
-            this.form.value.image_url,
-            this.form.value.name,
-            this.form.value.description,
-            this.editCatId
-          )
-          .subscribe(() => {
-            this.navCtrl.navigateBack("/admin/admins/category");
-            el.dismiss();
-          });
+    this.addCatSub = this.catService
+      .addCategory(
+        this.form.value.image_url,
+        this.form.value.name,
+        this.form.value.description,
+        this.editCatId
+      )
+      .subscribe(() => {
+        this.navCtrl.navigateBack("/admin/admins/category");
       });
   }
 
@@ -90,6 +83,7 @@ export class AddCategoryPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    console.log("destriyed..");
     if (this.getCatSub) {
       this.getCatSub.unsubscribe();
     }

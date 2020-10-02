@@ -53,6 +53,15 @@ export class CartService {
   }
 
   /**
+   * Function to get cart based on cart item status
+   * @param status: string
+   */
+  public async getCartByStatus(status: string): Promise<ICart> {
+    Logger.log(`Inside get cart by status service: ${status}`);
+    return await this.cartModel.find({ status }).exec();
+  }
+
+  /**
    * Function to delete cart based on the provided cart Id
    * @param cartId: string
    */

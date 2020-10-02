@@ -47,6 +47,7 @@ export class CartController {
         return response.status(HttpStatus.CREATED).send({
           success: true,
           message: cart_module_content.cart_add_success_message,
+          _id: cartCreateResponse['_id'],
         });
       });
   }
@@ -70,7 +71,7 @@ export class CartController {
    * Function to get all carts
    *
    */
-  @Get('carts')
+  @Get('cart')
   @ApiOperation({ summary: 'Get all carts' })
   @ApiResponse({ status: HttpStatus.OK, type: CartDto })
   public async getAll(): Promise<ICart[]> {
@@ -86,6 +87,19 @@ export class CartController {
   @ApiResponse({ status: HttpStatus.OK, type: CartDto })
   public async getCart(@Param('cartId') cartId: string): Promise<ICart> {
     return this.cartService.getCart(cartId);
+  }
+
+  /**
+   * Function to get cart by status
+   * @param status: string
+   */
+  @Get('cartbystatus/:status')
+  @ApiOperation({ summary: 'Get cart by status' })
+  @ApiResponse({ status: HttpStatus.OK, type: CartDto })
+  public async getCartByStatus(
+    @Param('status') status: string,
+  ): Promise<ICart> {
+    return this.cartService.getCartByStatus(status);
   }
 
   /**

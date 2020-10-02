@@ -71,7 +71,7 @@ export class CategoryService {
       tap((cats) => {
         const category = new Category(name, description, imgURL, true, _id);
         if (editCatId) {
-          cats.map((cat, index) => {
+          cats.map((cat) => {
             if (cat._id === _id) {
               cat.name = name;
               cat.description = description;
