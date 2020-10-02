@@ -20,6 +20,12 @@ export class User extends Document {
   address: string;
 
   @Prop()
+  housename: string;
+
+  @Prop()
+  password: string;
+
+  @Prop()
   pincode: number;
 
   @Prop()

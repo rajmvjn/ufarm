@@ -43,6 +43,16 @@ const routes: Routes = [
         ],
       },
       {
+        path: "cart",
+        loadChildren: () =>
+          import("./cart/cart.module").then((m) => m.CartPageModule),
+      },
+      {
+        path: "orders",
+        loadChildren: () =>
+          import("./orders/orders.module").then((m) => m.OrdersPageModule),
+      },
+      {
         path: "sell",
         children: [
           {
@@ -60,8 +70,8 @@ const routes: Routes = [
           {
             path: ":sellItemId",
             loadChildren: () =>
-              import("./sell/sell-item-detail/sell-item-detail.module").then(
-                (m) => m.SellItemDetailPageModule
+              import("./sell/add-sell-item/add-sell-item.module").then(
+                (m) => m.AddSellItemPageModule
               ),
           },
         ],

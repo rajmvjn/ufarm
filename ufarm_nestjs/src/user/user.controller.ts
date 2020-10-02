@@ -77,6 +77,8 @@ export class UserController {
         return response.status(HttpStatus.CREATED).send({
           success: true,
           message: user_module_content.user_create_success_message,
+          _id: createUserResponse['_id'],
+          avatar: createUserResponse.avatar,
         });
       });
   }
@@ -106,7 +108,9 @@ export class UserController {
     @UploadedFile() profileImage: MulterFile,
     @Param('userId') userId: string,
   ): Promise<IUser> {
-    updateUserDto.avatar = profileImage.filename;
+    if (profileImage) {
+      updateUserDto.avatar = profileImage.filename;
+    }
     return this.userService.updateUser(updateUserDto, userId);
   }
 
@@ -120,6 +124,22 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
   public async getAll(): Promise<IUser[]> {
     return this.userService.getAllUser();
+  }
+
+  /**
+   * Function to get user by email and password
+   * @param userId: string
+   */
+  @Post('auth')
+  @ApiTags('User')
+  @ApiOperation({ summary: 'get user authenticated' })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: HttpStatus.OK, type: UserDto })
+  public async getUserAuth(
+    @Body() user: { email: string; password: string },
+  ): Promise<IUser> {
+    console.log(user);
+    return this.userService.getUserAuthenticated(user);
   }
 
   /**

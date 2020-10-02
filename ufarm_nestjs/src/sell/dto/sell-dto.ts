@@ -11,10 +11,6 @@ import {
 
 export class SellDto {
   @ApiProperty()
-  @IsOptional()
-  readonly item_id: string;
-
-  @ApiProperty()
   @IsDefined()
   @IsNotEmpty()
   @IsString()
@@ -41,18 +37,10 @@ export class SellDto {
   readonly quantity_available: number;
 
   @ApiProperty()
-  @IsNumber()
-  readonly price: number;
-
-  @ApiProperty()
   @IsDefined()
   @IsString()
   @IsNotEmpty()
   readonly unit: string;
-
-  @ApiProperty()
-  @IsNumber()
-  readonly unit_value: number;
 
   @ApiProperty()
   @IsDefined()
@@ -66,7 +54,7 @@ export class SellDto {
 
   @ApiProperty()
   @IsOptional()
-  readonly offer_price: number;
+  readonly offer_price_percentage: number;
 
   @ApiProperty()
   @IsOptional()

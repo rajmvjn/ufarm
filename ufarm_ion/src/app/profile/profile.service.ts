@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 
-import { BehaviorSubject, Observable } from "rxjs";
+import { ReplaySubject, Observable } from "rxjs";
 import { take, tap, switchMap, map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 
@@ -12,113 +12,67 @@ import { environment } from "../../environments/environment";
 })
 export class ProfileService {
   BaseURL = environment.BaseURL;
-  private _profiles = new BehaviorSubject<Profile[]>([]);
+  private _profile = new ReplaySubject<Profile>(1); // profile will set on the auth, other sub will get later when they subscribe
   profileEditAdd: Observable<Profile>;
 
   constructor(private http: HttpClient) {}
 
-  fetchAllProfiles() {
-    return this.http.get<Profile[]>(`${this.BaseURL}v1/users`).pipe(
-      take(1),
-      tap((users) => {
-        this._profiles.next(users);
-      })
-    );
+  get profile(): Observable<Profile> {
+    return this._profile.asObservable();
   }
 
-  get profiles() {
-    return this._profiles.asObservable();
+  setProfileAfterAuth(profile: Profile | any) {
+    if (profile.address && typeof profile.address !== "object") {
+      profile.address = JSON.parse(profile.address);
+    }
+
+    return this._profile.next({ ...profile });
   }
 
   addEditProfile(profileData: Profile): Observable<any> {
-    const {
-      name,
-      email,
-      pincode,
-      address,
-      avatar,
-      phone,
-      sell,
-      status,
-      _id,
-    } = profileData;
+    let _id = profileData._id;
+    let formData = new FormData();
+    let avatar_url;
+    let profileUpdated: any = {};
+    formData.append("address", JSON.stringify(profileData.address));
 
-    const imgName = new Date().getTime() + ".png";
-    const uploadData = new FormData();
-
-    uploadData.append("name", name);
-    uploadData.append("email", email);
-    uploadData.append("pincode", pincode);
-    uploadData.append("address", address);
-
-    uploadData.append("phone", phone);
-
-    if (typeof avatar !== "string") {
-      // on edit if the image not changed then its the strin type loaded from server
-      uploadData.append("profile_image", avatar, imgName);
-      uploadData.append("avatar", "");
+    for (const key in profileData) {
+      if (typeof profileData[key] !== "object") {
+        formData.append(key, profileData[key]);
+      }
     }
+
+    //append the image only in case add or dirty in edit..
+    if (profileData["avatar"] && typeof profileData["avatar"] !== "string") {
+      formData.append(
+        "profile_image",
+        profileData["avatar"],
+        new Date().getTime() + ".png"
+      );
+    }
+
     if (_id) {
       this.profileEditAdd = this.http.put<Profile>(
         `${this.BaseURL}v1/user/${_id}`,
-        uploadData
+        formData
       );
     } else {
       this.profileEditAdd = this.http.post<any>(
         `${this.BaseURL}v1/user`,
-        uploadData
+        formData
       );
     }
     return this.profileEditAdd.pipe(
       take(1),
-      switchMap((resData) => {
-        return this.profiles; // this witches to new observable, new observable returned after http observable
-      }),
-      take(1),
-      tap((users) => {
-        const profile = new Profile(
-          name,
-          phone,
-          avatar,
-          email,
-          address,
-          pincode,
-          status,
-          sell,
-          _id
-        );
-
-        this._profiles.next(users.concat(profile));
-      })
-    );
-  }
-
-  getProfile(user_id: string): Observable<Profile> {
-    return this.http.get(`${this.BaseURL}v1/user/${user_id}`).pipe(
-      map((data) => {
-        return {
-          _id: data["_id"],
-          email: data["email"],
-          name: data["name"],
-          avatar: `${environment.BaseURL}images/${data["avatar"]}`,
-          phone: data["phone"],
-          address: data["address"],
-          pincode: data["pincode"],
-          status: data["status"],
-        };
-      })
-    );
-  }
-
-  deleteProfile(user_id: string) {
-    return this.http.delete(`${this.BaseURL}v1/user/${user_id}`).pipe(
-      take(1),
-      switchMap((resData) => {
-        return this.profiles;
-      }),
-      take(1),
-      tap((users) => {
-        this._profiles.next(users.filter((user) => user._id !== user_id));
+      tap((resData: any) => {
+        formData.set("_id", resData._id);
+        formData.set("avatar", avatar_url);
+        formData.forEach((value, key) => {
+          profileUpdated[key] = value;
+        });
+        profileUpdated.avatar = resData.avatar;
+        profileUpdated.address = profileData.address;
+        this._profile.next(profileUpdated);
       })
     );
   }

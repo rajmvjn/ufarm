@@ -1,29 +1,46 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { of } from "rxjs";
+import constants from "../farm-core/constants/constants";
+import { environment } from "../../environments/environment";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthService {
+  private _isuser_authenticated = false;
+  private _user_role = constants.USER_ROLE.guest;
 
-  private _isuser_authenticated = true;
-  private _is_admin = true;
+  base_url = environment.BaseURL;
 
-  constructor() { }
+  constructor(private http: HttpClient) {}
 
-  get is_admin() {
-    return this._is_admin;
+  get user_role() {
+    return this._user_role;
+  }
+
+  set user_role(role: string) {
+    this._user_role = role;
   }
 
   get isuser_authenticated() {
     return this._isuser_authenticated;
   }
 
-  login() {
-    this._isuser_authenticated = true;
+  set isuser_authenticated(status: boolean) {
+    this._isuser_authenticated = status;
+  }
+
+  login(formData: any) {
+    return this.http.post(`${this.base_url}v1/auth`, formData);
   }
 
   logout() {
-    this._isuser_authenticated = false;
+    this.isuser_authenticated = false;
   }
 
+  skipLogin() {
+    this._user_role = constants.USER_ROLE.guest;
+    return of(this._user_role);
+  }
 }

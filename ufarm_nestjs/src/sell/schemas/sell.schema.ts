@@ -5,9 +5,6 @@ import { Document } from 'mongoose';
 @Schema()
 export class Sell extends Document {
   @Prop()
-  item_id: string;
-
-  @Prop()
   name: string;
 
   @Prop()
@@ -23,13 +20,7 @@ export class Sell extends Document {
   quantity_available: number;
 
   @Prop()
-  price: number;
-
-  @Prop()
   unit: string;
-
-  @Prop()
-  unit_value: number;
 
   @Prop()
   sell_user_id: string;
@@ -38,7 +29,7 @@ export class Sell extends Document {
   status: boolean;
 
   @Prop()
-  offer_price: number;
+  offer_price_percentage: number;
 
   @Prop()
   image_url: string;

@@ -6,6 +6,7 @@ import {
   ViewChild,
   ElementRef,
   Input,
+  OnChanges,
 } from "@angular/core";
 import {
   Plugins,
@@ -20,13 +21,12 @@ import { Platform } from "@ionic/angular";
   templateUrl: "./image-picker.component.html",
   styleUrls: ["./image-picker.component.scss"],
 })
-export class ImagePickerComponent implements OnInit {
+export class ImagePickerComponent implements OnInit, OnChanges {
   @ViewChild("filePicker", { static: false }) filePickerRef: ElementRef<
     HTMLInputElement
   >;
   @Output() imagePick = new EventEmitter<string | File>();
   @Input() showPreview: string;
-
   @Input() imageUrl;
 
   selectedImage: string;
@@ -41,8 +41,14 @@ export class ImagePickerComponent implements OnInit {
     ) {
       this.usePicker = true;
     }
-    console.log("this.showPreview", this.showPreview);
+
     if (this.showPreview) {
+      this.selectedImage = this.imageUrl + this.showPreview;
+    }
+  }
+
+  ngOnChanges() {
+    if (typeof this.showPreview === "string") {
       this.selectedImage = this.imageUrl + this.showPreview;
     }
   }

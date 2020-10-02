@@ -27,6 +27,17 @@ export class UserService {
   }
 
   /**
+   * Function to get user based on the provided user Id
+   * @param userId: string
+   */
+  public async getUserAuthenticated(user: any): Promise<IUser> {
+    Logger.log(`Inside get user by id service: ${user.email}`);
+    return await this.userModel
+      .find({ email: user.email, password: user.password })
+      .exec();
+  }
+
+  /**
    * Function to create user
    * @param userReq: UserDto
    */

@@ -1,8 +1,8 @@
 <ion-segment
-  [value]="categories.length ? categories[0].name : ''"
+  [value]="categories.length ? categories[0]._id : ''"
   (ionChange)="onCatChange($event)"
 >
-  <ion-segment-button *ngFor="let cat of categories" [value]="cat.name">
+  <ion-segment-button *ngFor="let cat of categories" [value]="cat._id">
     {{ cat.name }}</ion-segment-button
   >
 </ion-segment>

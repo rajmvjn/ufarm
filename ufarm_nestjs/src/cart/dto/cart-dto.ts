@@ -15,12 +15,6 @@ export class CartDto {
   readonly cart_id: string;
 
   @ApiProperty()
-  @IsDefined()
-  @IsNotEmpty()
-  @IsString()
-  readonly item_id: string;
-
-  @ApiProperty()
   @IsNumber()
   readonly quantity: number;
 

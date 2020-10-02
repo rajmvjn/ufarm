@@ -7,6 +7,7 @@ import { IonicModule } from "@ionic/angular";
 import { AddSellItemPageRoutingModule } from "./add-sell-item-routing.module";
 
 import { AddSellItemPage } from "./add-sell-item.page";
+import { SharedModule } from "../../../shared/shared.module";
 
 @NgModule({
   imports: [
@@ -14,6 +15,7 @@ import { AddSellItemPage } from "./add-sell-item.page";
     ReactiveFormsModule,
     IonicModule,
     AddSellItemPageRoutingModule,
+    SharedModule,
   ],
   declarations: [AddSellItemPage],
 })

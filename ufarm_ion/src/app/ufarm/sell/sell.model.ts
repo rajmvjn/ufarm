@@ -5,12 +5,10 @@ export interface SellItem {
   farm_id: string;
   description?: string;
   quantity_available: number;
-  price: number;
   unit: string;
-  unit_value: number;
   sell_user_id?: string;
   status?: boolean;
-  offer_price?: number;
+  offer_price_percentage?: number;
   image_url?: string;
   date_created?: Date;
 }

@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CategoryService } from "../../admin/category/category.service";
 import { Subscription } from "rxjs";
-import { LoadingController, NavController } from "@ionic/angular";
+import { NavController } from "@ionic/angular";
 import { AuthService } from "../../auth/auth.service";
 import { FarmService } from "./farm.service";
 import { FarmItem } from "./farm.model";
 import { environment } from "../../../environments/environment";
+import constants from "../../farm-core/constants/constants";
 
 @Component({
   selector: "app-farm",
@@ -19,42 +20,36 @@ export class FarmPage implements OnInit, OnDestroy {
 
   isAdmin: boolean;
   farmItems: FarmItem[];
+  itemsUnFiltered: FarmItem[];
   imgURL = environment.ImagesURL;
+  user_role = constants.USER_ROLE;
 
   constructor(
     private catService: CategoryService,
-    private loadingCtrl: LoadingController,
-    private authService: AuthService,
+    public authService: AuthService,
     private farmService: FarmService,
     private navCtrl: NavController
   ) {}
 
   ngOnInit() {
     //Fetch categories for both admin and customers get the rxjs subscriptions ready for the app..
-    this.loadingCtrl
-      .create({ message: "Loading..", keyboardClose: true })
-      .then((el) => {
-        el.present();
-        this.isAdmin = this.authService.is_admin;
-        this.catSub = this.catService.fetchAllCategories().subscribe(() => {
-          el.dismiss();
-        });
 
-        this.fetchAllSub = this.farmService
-          .fetchAllFarmItems()
-          .subscribe(() => {
-            this.farmItemSub = this.farmService.farm_item.subscribe(
-              (farmItems) => {
-                this.farmItems = farmItems;
-                console.log(farmItems);
-              }
-            );
-          });
+    this.fetchAllSub = this.farmService.fetchAllFarmItems().subscribe(() => {
+      this.farmItemSub = this.farmService.farm_item.subscribe((farmItems) => {
+        this.itemsUnFiltered = farmItems;
+        this.catService.categories.subscribe((cats) => {
+          this.onCategoryChange(null, cats[0]._id); // fetch only on load and get the right cat id..
+        });
+        console.log(farmItems);
       });
+    });
   }
 
-  onCategoryChange(event: CustomEvent) {
-    console.log(event.detail);
+  onCategoryChange(event: CustomEvent, cat_id?: string) {
+    let catId = cat_id ? cat_id : event.detail.value;
+    this.farmItems = this.itemsUnFiltered?.filter(
+      (item) => item.cat_id === catId
+    );
   }
 
   onEdit(_id: string) {
@@ -62,8 +57,12 @@ export class FarmPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.catSub.unsubscribe();
-    this.fetchAllSub.unsubscribe();
+    if (this.catSub) {
+      this.catSub.unsubscribe();
+    }
+    if (this.fetchAllSub) {
+      this.fetchAllSub.unsubscribe();
+    }
     if (this.farmItemSub) {
       this.farmItemSub.unsubscribe();
     }
