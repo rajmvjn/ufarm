@@ -34,7 +34,8 @@ export class UserService {
     Logger.log(`Inside get user by id service: ${user.email}`);
     return await this.userModel
       .find({
-        where: { email: user.email, password: user.password },
+        email: user.email,
+        password: user.password,
       })
       .exec();
   }
