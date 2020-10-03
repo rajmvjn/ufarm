@@ -49,6 +49,6 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  await app.listen(config().PORT);
+  await app.listen(config().PORT || 3000);
 }
 bootstrap();

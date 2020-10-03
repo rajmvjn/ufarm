@@ -11,6 +11,7 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
+  HttpCode,
 } from '@nestjs/common';
 import {
   ApiOperation,
@@ -24,7 +25,7 @@ import { Response } from 'express';
 import { diskStorage, MulterFile } from 'multer';
 
 import { UserService } from './user.service';
-import { UserDto } from './dto/user-dto';
+import { UserDto, AuthUserDto } from './dto/user-dto';
 import { IUser } from './interfaces/user.interface';
 import { SellerRequestDto } from './dto/seller-request.dto';
 import { ISellerRequest } from './interfaces/seller-request.interface';
@@ -133,12 +134,10 @@ export class UserController {
   @Post('auth')
   @ApiTags('User')
   @ApiOperation({ summary: 'get user authenticated' })
-  @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
-  public async getUserAuth(
-    @Body() user: { email: string; password: string },
-  ): Promise<IUser> {
-    console.log(user);
+  @HttpCode(200)
+  public async getUserAuth(@Body() user: AuthUserDto): Promise<IUser> {
+    Logger.log(JSON.stringify(user));
     return this.userService.getUserAuthenticated(user);
   }
 
