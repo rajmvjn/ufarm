@@ -48,3 +48,11 @@ export class UserDto {
   @ApiProperty()
   readonly admin?: boolean;
 }
+
+export class AuthUserDto {
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  password: string;
+}
