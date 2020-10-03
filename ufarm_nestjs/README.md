@@ -1,6 +1,6 @@
 ## Description
 
-Farmer App micro service built using Nestjs framework. It will contain API's for product selling,purchase, user account, checkout and farming guidelines. MongoDB acts as backend service for database activities.
+Farmer App micro service built using Nestjs framework. It will contain API's for product selling,purchase, user account, checkout and farming guidelines. MongoDB acts as backend service for database activities.Heroku is used for hosting
 
 ## Installation
 
