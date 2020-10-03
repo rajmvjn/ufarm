@@ -33,6 +33,18 @@ export class CartController {
   @Post('cart')
   @ApiOperation({ summary: 'Create cart' })
   @ApiResponse({ status: HttpStatus.OK, type: CartDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async createCart(
     @Body() createCartDto: CartDto,
     @Res() response: Response,
@@ -60,6 +72,18 @@ export class CartController {
   @Put('cart/:cartId')
   @ApiOperation({ summary: 'Update cart based on cart id' })
   @ApiResponse({ status: HttpStatus.OK, type: CartDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async updateCart(
     @Body() updateCartDto: CartDto,
     @Param('cartId') cartId: string,
@@ -74,6 +98,18 @@ export class CartController {
   @Get('cart')
   @ApiOperation({ summary: 'Get all carts' })
   @ApiResponse({ status: HttpStatus.OK, type: CartDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getAll(): Promise<ICart[]> {
     return this.cartService.getAllCart();
   }
@@ -85,6 +121,18 @@ export class CartController {
   @Get('cart/:cartId')
   @ApiOperation({ summary: 'Get cart by Id' })
   @ApiResponse({ status: HttpStatus.OK, type: CartDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getCart(@Param('cartId') cartId: string): Promise<ICart> {
     return this.cartService.getCart(cartId);
   }
@@ -96,6 +144,18 @@ export class CartController {
   @Get('cartbystatus/:status')
   @ApiOperation({ summary: 'Get cart by status' })
   @ApiResponse({ status: HttpStatus.OK, type: CartDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getCartByStatus(
     @Param('status') status: string,
   ): Promise<ICart> {
@@ -112,6 +172,18 @@ export class CartController {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: constants.no_content,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
   })
   public async deleteCart(
     @Param('cartId') cartId: string,

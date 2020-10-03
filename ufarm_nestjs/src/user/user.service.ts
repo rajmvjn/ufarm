@@ -33,8 +33,8 @@ export class UserService {
   public async getUserAuthenticated(user: AuthUserDto): Promise<IUser> {
     Logger.log(`Inside get user by id service: ${user.email}`);
     return await this.userModel
-      .findOne({
-        where: { email: user.email, password: user.password, status: true },
+      .find({
+        where: { email: user.email, password: user.password },
       })
       .exec();
   }
