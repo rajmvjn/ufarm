@@ -32,6 +32,10 @@ export class UserDto {
 
   @ApiProperty()
   @IsOptional()
+  readonly role: string;
+
+  @ApiProperty()
+  @IsOptional()
   readonly pincode: number;
 
   @ApiProperty()

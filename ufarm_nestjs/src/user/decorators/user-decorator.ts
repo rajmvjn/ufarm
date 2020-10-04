@@ -20,6 +20,11 @@ export const ApiUser = (fileName: string): MethodDecorator => (
           format: 'text',
           default: '',
         },
+        role: {
+          type: 'string',
+          format: 'text',
+          default: '',
+        },
         phone: {
           type: 'string',
           format: 'text',
