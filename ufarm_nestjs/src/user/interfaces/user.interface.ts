@@ -13,4 +13,5 @@ export interface IUser extends mongoose.Document {
   date_created: Date;
   sell?: boolean;
   admin?: boolean;
+  role?: string;
 }
