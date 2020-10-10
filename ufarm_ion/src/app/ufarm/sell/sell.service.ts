@@ -48,6 +48,22 @@ export class SellService {
   addorEditSell(sellItem: SellItem) {
     let _id: string;
     let imageUrl: string;
+    let formData = new FormData();
+
+    for (const key in sellItem) {
+      if (typeof sellItem[key] !== "object") {
+        formData.append(key, sellItem[key]);
+      }
+    }
+
+    //append the image only in case add or dirty in edit..
+    if (sellItem["image_url"] && typeof sellItem["image_url"] !== "string") {
+      formData.append(
+        "sell_image",
+        sellItem["image_url"],
+        new Date().getTime() + ".png"
+      );
+    }
 
     if (sellItem._id) {
       //edit

@@ -11,4 +11,5 @@ export interface SellItem {
   offer_price_percentage?: number;
   image_url?: string;
   date_created?: Date;
+  sell_image?: File;
 }
