@@ -27,29 +27,18 @@ export class SellDto {
   readonly farm_id: string;
 
   @ApiProperty()
-  @IsDefined()
-  @IsNotEmpty()
-  @IsString()
   readonly description: string;
 
   @ApiProperty()
-  @IsNumber()
   readonly quantity_available: number;
 
   @ApiProperty()
-  @IsDefined()
-  @IsString()
-  @IsNotEmpty()
   readonly unit: string;
 
   @ApiProperty()
-  @IsDefined()
-  @IsString()
-  @IsNotEmpty()
   readonly sell_user_id: string;
 
   @ApiProperty()
-  @IsBoolean()
   readonly status: boolean;
 
   @ApiProperty()
@@ -58,7 +47,7 @@ export class SellDto {
 
   @ApiProperty()
   @IsOptional()
-  readonly image_url: string;
+  image_url: string;
 
   @ApiProperty()
   @IsOptional()
