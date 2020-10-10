@@ -32,6 +32,10 @@ export class UserDto {
 
   @ApiProperty()
   @IsOptional()
+  readonly role: string;
+
+  @ApiProperty()
+  @IsOptional()
   readonly pincode: number;
 
   @ApiProperty()
@@ -47,4 +51,12 @@ export class UserDto {
 
   @ApiProperty()
   readonly admin?: boolean;
+}
+
+export class AuthUserDto {
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  password: string;
 }

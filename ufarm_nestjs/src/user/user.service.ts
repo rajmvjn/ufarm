@@ -6,7 +6,7 @@ import { Model } from 'mongoose';
 
 import { IUser } from './interfaces/user.interface';
 import { ISellerRequest } from './interfaces/seller-request.interface';
-import { UserDto } from './dto/user-dto';
+import { UserDto, AuthUserDto } from './dto/user-dto';
 import { SellerRequestDto } from './dto/seller-request.dto';
 
 @Injectable()
@@ -30,10 +30,13 @@ export class UserService {
    * Function to get user based on the provided user Id
    * @param userId: string
    */
-  public async getUserAuthenticated(user: any): Promise<IUser> {
+  public async getUserAuthenticated(user: AuthUserDto): Promise<IUser> {
     Logger.log(`Inside get user by id service: ${user.email}`);
     return await this.userModel
-      .find({ email: user.email, password: user.password })
+      .find({
+        email: user.email,
+        password: user.password,
+      })
       .exec();
   }
 

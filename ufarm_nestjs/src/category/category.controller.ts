@@ -60,6 +60,18 @@ export class CategoryController {
   @ApiCategory('category_image')
   @ApiOperation({ summary: 'Create category' })
   @ApiResponse({ status: HttpStatus.CREATED, type: CategoryDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public async createCategory(
     @Body() createCategoryDto: CategoryDto,
@@ -102,6 +114,18 @@ export class CategoryController {
   @ApiCategory('category_image')
   @ApiOperation({ summary: 'Update Category based on provided category Id' })
   @ApiResponse({ status: HttpStatus.OK, type: CategoryDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async updateCategory(
     @Body() updateCategoryDto: CategoryDto,
     @UploadedFile() catImage: MulterFile,
@@ -131,6 +155,18 @@ export class CategoryController {
   @Get('category/:categoryId')
   @ApiOperation({ summary: 'Get category by Id' })
   @ApiResponse({ status: HttpStatus.OK, type: CategoryDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getCategory(
     @Param('categoryId') categoryId: string,
   ): Promise<ICategory[]> {
@@ -147,6 +183,18 @@ export class CategoryController {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: constants.no_content,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
   })
   public async deleteCategory(
     @Param('categoryId') categoryId: string,

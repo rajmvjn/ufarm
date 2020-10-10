@@ -60,4 +60,22 @@ export class SellService {
     Logger.log(`Inside delete sell by id service: ${itemId}`);
     return await this.sellModel.findByIdAndRemove(itemId).exec();
   }
+
+  /**
+   * Function to return the list of seller items
+   */
+  public async getSellerItems(sellerId: string): Promise<ISell[]> {
+    Logger.log('Inside get Seller items service', sellerId);
+    return await this.sellModel.find({ sell_user_id: sellerId }).exec();
+  }
+
+  /**
+   * Function to return the list of buyer items
+   */
+  public async getBuyerItems(sellerId: string): Promise<ISell[]> {
+    Logger.log('Inside get Buyer items service', sellerId);
+    return await this.sellModel
+      .find({ sell_user_id: { $ne: sellerId } })
+      .exec();
+  }
 }
