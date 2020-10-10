@@ -11,6 +11,7 @@ export class Profile {
     public sell?: boolean,
     public _id?: string,
     public profile_image?: string | File,
-    public admin?: boolean
+    public admin?: boolean,
+    public role?: string
   ) {}
 }

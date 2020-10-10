@@ -8,13 +8,6 @@ const routes: Routes = [
     path: "",
     component: FarmPage,
   },
-  {
-    path: "farm-item-detail",
-    loadChildren: () =>
-      import("./farm-item-detail/farm-item-detail.module").then(
-        (m) => m.FarmItemDetailPageModule
-      ),
-  },
 ];
 
 @NgModule({

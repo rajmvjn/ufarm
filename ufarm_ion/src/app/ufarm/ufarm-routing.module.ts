@@ -17,11 +17,11 @@ const routes: Routes = [
               import("./farm/farm.module").then((m) => m.FarmPageModule),
           },
           {
-            path: ":farmItemId",
+            path: ":_id",
             loadChildren: () =>
-              import("./farm/farm-item-detail/farm-item-detail.module").then(
-                (m) => m.FarmItemDetailPageModule
-              ),
+              import(
+                "../ufarm/farm/add-farm-detail/add-farm-detail.module"
+              ).then((m) => m.AddFarmDetailPageModule),
           },
         ],
       },
@@ -78,14 +78,14 @@ const routes: Routes = [
       },
       {
         path: "",
-        redirectTo: "/ufarm/farms/farm",
+        redirectTo: "/ufarm/farms/buy",
         pathMatch: "full",
       },
     ],
   },
   {
     path: "",
-    redirectTo: "/ufarm/farms/farm",
+    redirectTo: "/ufarm/farms/buy",
     pathMatch: "full",
   },
 ];

@@ -4,23 +4,22 @@ import { BehaviorSubject, Observable } from "rxjs";
 import { environment } from "../../../environments/environment";
 import { HttpClient } from "@angular/common/http";
 import { take, switchMap, tap, map, catchError, filter } from "rxjs/operators";
-import { AutoCompleteService } from "ionic4-auto-complete";
 
 @Injectable({
   providedIn: "root",
 })
-export class FarmService implements AutoCompleteService {
+export class FarmService {
   base_url = environment.BaseURL;
   _farm_item = new BehaviorSubject<FarmItem[]>([]);
   imgUrl = environment.ImagesURL;
   editAddObs: Observable<FarmItem>;
   editFarmId: string;
 
+  constructor(private http: HttpClient) {}
+
   get farm_item() {
     return this._farm_item.asObservable();
   }
-
-  constructor(private http: HttpClient) {}
 
   fetchAllFarmItems() {
     return this.http.get<FarmItem[]>(`${this.base_url}v1/farm`).pipe(
@@ -34,16 +33,6 @@ export class FarmService implements AutoCompleteService {
   getFarmItemsByCategory(cat_id: string): Observable<FarmItem[]> {
     return this.farm_item.pipe(
       map((farm_item) => farm_item.filter((item) => item.cat_id === cat_id))
-    );
-  }
-
-  getResults(keyword: string): Observable<any[]> {
-    return this.farm_item.pipe(
-      map((farmitem) => {
-        return farmitem.filter((item) =>
-          item.name.toLowerCase().startsWith(keyword.toLowerCase())
-        );
-      })
     );
   }
 

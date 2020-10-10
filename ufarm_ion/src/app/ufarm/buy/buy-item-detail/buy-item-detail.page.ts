@@ -8,6 +8,7 @@ import { FarmItem } from "../../farm/farm.model";
 import { Cart } from "../../cart/cart.model";
 import { CartService } from "../../cart/cart.service";
 import constants from "../../../farm-core/constants/constants";
+import { AuthService } from "../../../auth/auth.service";
 
 @Component({
   selector: "app-buy-item-detail",
@@ -26,18 +27,19 @@ export class BuyItemDetailPage implements OnInit {
     private route: ActivatedRoute,
     private sellService: SellService,
     private farmService: FarmService,
-    private cartService: CartService
+    private cartService: CartService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.route.paramMap.subscribe((paramMap) => {
       if (paramMap.has("buyItemId")) {
         this.buyItemId = paramMap.get("buyItemId");
+
         this.sellService
           .getSellItemById(this.buyItemId)
           .subscribe((buyItem) => {
             this.item = buyItem;
-            this.imageUrl = environment.ImagesURL;
             this.showPreview = buyItem.image_url;
             this.farmService
               .getFarmItem(buyItem.farm_id)
@@ -45,6 +47,15 @@ export class BuyItemDetailPage implements OnInit {
           });
       }
     });
+  }
+
+  onBuyNow() {
+    if (
+      this.authService.get_user_role_sub.value === constants.USER_ROLE.guest
+    ) {
+    } else {
+      // add to cart with confirm status ie reduce the available quantity as well.
+    }
   }
 
   onCartAdd() {

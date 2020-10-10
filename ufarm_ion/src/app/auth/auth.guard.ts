@@ -15,7 +15,8 @@ export class AuthGuard implements CanLoad {
     segments: UrlSegment[]
   ): Observable<boolean> | Promise<boolean> | boolean {
     if (
-      this.authService.user_role === constants.USER_ROLE.admin &&
+      this.authService.get_user_role_sub.getValue() ===
+        constants.USER_ROLE.admin &&
       !this.authService.isuser_authenticated
     ) {
       //admin should be logged in user..

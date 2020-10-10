@@ -11,6 +11,7 @@ import { environment } from "../../../environments/environment";
 export class SellService {
   BaseURL = environment.BaseURL;
   private _sell_items = new BehaviorSubject<SellItem[]>([]);
+  private _buy_items = new BehaviorSubject<SellItem[]>([]);
   labelAttribute = "name";
   formValueAttribute = "numericCode";
   editItemId: string;
@@ -22,11 +23,24 @@ export class SellService {
     return this._sell_items.asObservable();
   }
 
-  fetchSellItems(): Observable<SellItem[]> {
-    return this.http.get<SellItem[]>(`${this.BaseURL}v1/sell`).pipe(
+  get buyItems() {
+    return this._buy_items.asObservable();
+  }
+
+  fetchSellItems(id: string): Observable<SellItem[]> {
+    return this.http.get<SellItem[]>(`${this.BaseURL}v1/sell-items/${id}`).pipe(
       take(1),
       tap((items) => {
         this._sell_items.next(items);
+      })
+    );
+  }
+
+  fetchBuyItems(id: string): Observable<SellItem[]> {
+    return this.http.get<SellItem[]>(`${this.BaseURL}v1/buy-items/${id}`).pipe(
+      take(1),
+      tap((items) => {
+        this._buy_items.next(items);
       })
     );
   }

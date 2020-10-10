@@ -38,13 +38,13 @@ export class LoadingInterceptor implements HttpInterceptor {
   }
 
   showLoader() {
-    this.loadingEl = this.loadingCtrl
-      .create({
-        message: "Processing..",
-      })
-      .then((el) => {
-        el.present();
-      });
+    // this.loadingEl = this.loadingCtrl
+    //   .create({
+    //     message: "Processing..",
+    //   })
+    //   .then((el) => {
+    //     el.present();
+    //   });
   }
 
   hideLoader() {

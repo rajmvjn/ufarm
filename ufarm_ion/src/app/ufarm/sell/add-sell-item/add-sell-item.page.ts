@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
 
@@ -11,19 +11,22 @@ import { CategoryService } from "../../../admin/category/category.service";
 import { FarmService } from "../../farm/farm.service";
 import { FarmItem } from "../../farm/farm.model";
 import { ImageService } from "../../../shared/services/image/image.service";
+import { ProfileService } from "../../../profile/profile.service";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: "app-add-sell-item",
   templateUrl: "./add-sell-item.page.html",
   styleUrls: ["./add-sell-item.page.scss"],
 })
-export class AddSellItemPage implements OnInit {
+export class AddSellItemPage implements OnInit, OnDestroy {
   farmItemByCat: FarmItem[];
   formFields: SellItem;
   imageUrl: string;
   allowed_price_diff: number;
   showPreview: string;
   editItemId: string;
+  allSubs: Subscription[] = [];
 
   sellItemForm = new FormGroup({
     farm_id: new FormControl(null, {
@@ -44,7 +47,8 @@ export class AddSellItemPage implements OnInit {
     unit: new FormControl(null, {
       validators: [Validators.required],
     }),
-    offer_price_percentage: new FormControl(null, {
+    //default price difference is zero, meaning sell item price will be base price
+    offer_price_percentage: new FormControl(0, {
       validators: [Validators.required],
     }),
     image_url: new FormControl(null),
@@ -53,6 +57,7 @@ export class AddSellItemPage implements OnInit {
       Validators.required,
     ]),
     name: new FormControl(null),
+    status: new FormControl(true),
   });
 
   constructor(
@@ -61,81 +66,111 @@ export class AddSellItemPage implements OnInit {
     private route: ActivatedRoute,
     public catService: CategoryService,
     public farmService: FarmService,
-    public navCtrl: NavController
+    public navCtrl: NavController,
+    private profileService: ProfileService
   ) {}
 
   ngOnInit() {
-    //this.initializeForm();
-    this.route.paramMap.subscribe((paramMap) => {
-      if (paramMap.has("sellItemId")) {
-        this.editItemId = paramMap.get("sellItemId");
-        this.sellService
-          .getSellItemById(this.editItemId)
-          .subscribe((sellItem) => {
-            this.sellItemForm.patchValue(sellItem);
-            this.imageUrl = environment.ImagesURL;
-            this.showPreview = sellItem.image_url;
-            this.farmService
-              .getFarmItem(sellItem.farm_id)
-              .subscribe((farmItem) =>
-                this.sellItemForm.patchValue({
-                  base_price: farmItem.base_price,
-                })
-              );
-          });
+    //fetch the depedent farm items data first,
+    this.onCatChage(); // set the subscription up front for the cat
+    this.allSubs[0] = this.farmService
+      .fetchAllFarmItems()
+      .subscribe((farmItems) => {
+        this.farmItemByCat = farmItems;
+        this.allSubs[1] = this.route.paramMap.subscribe((paramMap) => {
+          if (paramMap.has("sellItemId")) {
+            this.editItemId = paramMap.get("sellItemId");
+            this.allSubs[2] = this.sellService
+              .getSellItemById(this.editItemId)
+              .subscribe((sellItem) => {
+                this.imageUrl = environment.ImagesURL;
+                this.showPreview = sellItem.image_url;
+
+                farmItems.forEach((farmItem) => {
+                  if (farmItem._id === sellItem.farm_id) {
+                    this.allowed_price_diff = farmItem.allowed_price_diff;
+                    this.sellItemForm.patchValue({
+                      base_price: farmItem.base_price,
+                      farm_id: sellItem.farm_id,
+                      ...sellItem,
+                    });
+                  }
+                });
+                //disable the farm sell change in the case of edit
+                this.sellItemForm.get("farm_id").disable();
+              });
+          }
+        });
+      });
+
+    //set the sell user as logged in user
+    this.allSubs[4] = this.profileService.profile.subscribe((profileData) => {
+      if (profileData) {
+        this.sellItemForm.patchValue({
+          sell_user_id: profileData._id,
+        });
       }
     });
-    this.farmService.farm_item.subscribe(
-      (farmItems) => (this.farmItemByCat = farmItems)
-    );
-    this.onCatChage();
   }
 
   onAddEdit() {
     let newItem: SellItem = { ...this.sellItemForm.value };
-    newItem.sell_user_id = "abc123";
     newItem.status = true;
     newItem.name = this.sellItemForm.get("name").value;
     if (this.editItemId) {
       newItem._id = this.editItemId;
     }
 
-    this.sellService.addorEditSell(newItem).subscribe(
-      (data) => {
-        this.navCtrl.navigateBack("/ufarm/farms/sell");
-      },
-      (err) => {
-        console.log(err);
-      },
-      () => {
-        console.log("complete");
-      }
-    );
+    this.allSubs[5] = this.sellService.addorEditSell(newItem).subscribe((_) => {
+      this.navCtrl.navigateBack("/ufarm/farms/sell");
+    });
   }
 
-  initializeForm() {}
-
   onCatChage() {
-    this.sellItemForm.get("category_id").valueChanges.subscribe((val) => {
-      this.farmService.getFarmItemsByCategory(val).subscribe((farmItems) => {
-        this.farmItemByCat = farmItems;
+    this.allSubs[6] = this.sellItemForm
+      .get("category_id")
+      .valueChanges.subscribe((val) => {
+        this.allSubs[7] = this.farmService
+          .getFarmItemsByCategory(val)
+          .subscribe((farmItems) => {
+            console.log("sub1");
+            this.farmItemByCat = farmItems;
+          });
       });
-    });
 
-    this.sellItemForm.get("farm_id").valueChanges.subscribe((val) => {
-      this.farmItemByCat.filter((farmItem) => {
-        if (farmItem._id === val) {
-          let { _id, allowed_price_diff, ...formData } = { ...farmItem };
-          this.sellItemForm.patchValue({ ...formData });
-          this.allowed_price_diff = allowed_price_diff;
-          /*this.sellItemForm
-            .get("offer_price_percentage")
-            .setValidators([Validators.min(1), Validators.max(10)]);*/
-          this.imageUrl = environment.ImagesURL;
-          this.showPreview = formData.image_url;
-        }
+    this.allSubs[8] = this.sellItemForm
+      .get("farm_id")
+      .valueChanges.subscribe((val) => {
+        //check whether the item added already, then
+
+        this.sellService.sellItems.subscribe((sellItem) => {
+          const addedSell = sellItem.filter((s) => s.farm_id === val);
+          if (addedSell.length) {
+            this.editItemId = addedSell[0]._id;
+            let { category_id, farm_id, ...formDataEdit } = { ...addedSell[0] };
+
+            this.farmItemByCat.filter((farmItem) => {
+              if (farmItem._id === val) {
+                let { allowed_price_diff, base_price } = { ...farmItem };
+                //formDataEdit.base_price = base_price;
+                this.populateSellForm(
+                  formDataEdit,
+                  allowed_price_diff,
+                  base_price
+                );
+              }
+            });
+          } else {
+            this.editItemId = null;
+            this.farmItemByCat.filter((farmItem) => {
+              if (farmItem._id === val) {
+                let { _id, allowed_price_diff, ...formData } = { ...farmItem };
+                this.populateSellForm(formData, allowed_price_diff);
+              }
+            });
+          }
+        });
       });
-    });
   }
 
   onImagePicked(imageData: string | File, inputField: string) {
@@ -156,6 +191,37 @@ export class AddSellItemPage implements OnInit {
       this.sellItemForm.patchValue({ image_url: imageFile });
     } else {
       this.sellItemForm.patchValue({ nutrition_fact_image_url: imageFile });
+    }
+  }
+
+  populateSellForm(sellFromData, allowed_price_diff, base_price?) {
+    if (base_price) {
+      sellFromData.base_price = base_price;
+    }
+
+    this.sellItemForm.patchValue(sellFromData);
+
+    this.allowed_price_diff = allowed_price_diff;
+    this.sellItemForm
+      .get("offer_price_percentage")
+      .setValidators(
+        Validators.compose([
+          Validators.required,
+          Validators.max(allowed_price_diff),
+          Validators.min(allowed_price_diff * -1),
+        ])
+      );
+    this.imageUrl = environment.ImagesURL;
+    this.showPreview = sellFromData.image_url;
+  }
+
+  ngOnDestroy() {
+    console.log("add sell destroy");
+    if (this.allSubs.length) {
+      this.allSubs.forEach((sub) => {
+        //console.log(sub);
+        sub.unsubscribe();
+      });
     }
   }
 }
