@@ -21,7 +21,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { diskStorage, MulterFile } from 'multer';
-
 import { Response } from 'express';
 
 import { FarmService } from './farm.service';

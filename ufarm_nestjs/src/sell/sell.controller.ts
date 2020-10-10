@@ -9,9 +9,18 @@ import {
   Res,
   HttpStatus,
   Logger,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiConsumes,
+} from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
+import { diskStorage, MulterFile } from 'multer';
 import { Response } from 'express';
 
 import { SellService } from './sell.service';
@@ -19,6 +28,11 @@ import { SellDto } from './dto/sell-dto';
 import { ISell } from './interfaces/sell.interface';
 import { sell_module_content } from './sell-module-content';
 import { constants } from '../constants';
+import {
+  imageFileFilter,
+  editFileName,
+} from '../shared/utils/file-upload.util';
+import { ApiSellProduct } from './decorators/sell.decorator';
 
 @Controller('v1')
 @ApiTags('Items')
@@ -29,14 +43,28 @@ export class SellController {
    * Function to create new sell item based on the provided data
    * @param createSellDto : SellDto
    * @param response: Response
+   * @param sellImage: MulterFile
    */
   @Post('sell')
   @ApiOperation({ summary: 'Create sell product based on the provided data' })
   @ApiResponse({ status: HttpStatus.CREATED, description: constants.created })
+  @UseInterceptors(
+    FileInterceptor('sell_image', {
+      storage: diskStorage({
+        destination: './images',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiSellProduct('sell_image')
   public async createItem(
     @Body() createSellDto: SellDto,
     @Res() response: Response,
+    @UploadedFile() sellImage: MulterFile,
   ): Promise<Response> {
+    createSellDto.image_url = sellImage && sellImage.filename;
     return this.sellService
       .createItem(createSellDto)
       .then(createSellResponse => {
@@ -57,14 +85,30 @@ export class SellController {
    * Function to update sell prouduct based on the itemId
    * @param updateSellDto : SellDto
    * @param itemId: string
+   * @param sellImage: MulterFile
    */
   @Put('sell/:itemId')
   @ApiOperation({ summary: 'Update sell item based on item id' })
   @ApiResponse({ status: HttpStatus.OK, type: SellDto })
+  @UseInterceptors(
+    FileInterceptor('sell_image', {
+      storage: diskStorage({
+        destination: './images',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiSellProduct('sell_image')
   public async updateSell(
     @Body() updateSellDto: SellDto,
     @Param('itemId') itemId: string,
+    @UploadedFile() sellImage: MulterFile,
   ): Promise<ISell> {
+    if (sellImage) {
+      updateSellDto.image_url = sellImage.filename;
+    }
     return this.sellService.updateItem(updateSellDto, itemId);
   }
 
