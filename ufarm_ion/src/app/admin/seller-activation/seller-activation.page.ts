@@ -25,6 +25,10 @@ export class SellerActivationPage implements OnInit {
     });
   }
 
+  onChangeFilter(event: CustomEvent) {
+    this.users = this.users.filter((user) => user.name === event.detail.value);
+  }
+
   onProfileUpdate(event: CustomEvent, id: string, sellUpdate: boolean) {
     const actionHeader = sellUpdate ? " Sell" : " Status";
     const EnableOrDisable = event.detail.checked ? "Enable" : "Disable";

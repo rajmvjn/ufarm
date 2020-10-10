@@ -2,7 +2,11 @@
   [value]="categories.length ? categories[0]._id : ''"
   (ionChange)="onCatChange($event)"
 >
-  <ion-segment-button *ngFor="let cat of categories" [value]="cat._id">
+  <ion-segment-button
+    background="danger"
+    *ngFor="let cat of categories"
+    [value]="cat._id"
+  >
     {{ cat.name }}</ion-segment-button
   >
 </ion-segment>

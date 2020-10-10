@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { NavController, AlertController, IonItemSliding } from "@ionic/angular";
 
 import { ActivatedRoute } from "@angular/router";
@@ -9,19 +9,23 @@ import { Subscription } from "rxjs";
 import { SellItem } from "./sell.model";
 import { environment } from "../../../environments/environment";
 import { CategoryService } from "src/app/admin/category/category.service";
+import { ProfileService } from "src/app/profile/profile.service";
+import { Profile } from "src/app/profile/profile.model";
 
 @Component({
   selector: "app-sell",
   templateUrl: "./sell.page.html",
   styleUrls: ["./sell.page.scss"],
 })
-export class SellPage implements OnInit {
+export class SellPage implements OnInit, OnDestroy {
   private fetchAllObs$: Subscription;
   private sellItemsObs$: Subscription;
+  private delSub: Subscription;
   items: SellItem[];
   itemsUnFiltered: SellItem[];
   imageUrl = environment.ImagesURL;
   isLoading = false;
+  loggedInProfile: Profile;
 
   constructor(
     private sellService: SellService,
@@ -29,11 +33,32 @@ export class SellPage implements OnInit {
     private navCtrl: NavController,
     private route: ActivatedRoute,
     private alertCtrl: AlertController,
-    private catService: CategoryService
+    private catService: CategoryService,
+    private profileService: ProfileService
   ) {}
 
   ngOnInit() {
+    this.profileService.profile.subscribe((profileData) => {
+      if (profileData) {
+        this.loggedInProfile = profileData;
+      }
+    });
     this.fetchItems();
+  }
+
+  fetchItems() {
+    this.fetchAllObs$ = this.sellService
+      .fetchSellItems(this.loggedInProfile._id)
+      .subscribe(() => {
+        this.sellItemsObs$ = this.sellService.sellItems.subscribe(
+          (sellItems) => {
+            this.itemsUnFiltered = sellItems;
+            this.catService.categories.subscribe((cats) => {
+              this.onCategoryChange(null, cats[0]._id); // fetch only on load and get the right cat id..
+            });
+          }
+        );
+      });
   }
 
   onCategoryChange(event: CustomEvent, cat_id?: string) {
@@ -43,42 +68,24 @@ export class SellPage implements OnInit {
     );
   }
 
-  fetchItems() {
-    this.fetchAllObs$ = this.sellService.fetchSellItems().subscribe(
-      () => {
-        this.sellItemsObs$ = this.sellService.sellItems.subscribe(
-          (sellItems) => {
-            this.itemsUnFiltered = sellItems;
-            this.catService.categories.subscribe((cats) => {
-              this.onCategoryChange(null, cats[0]._id); // fetch only on load and get the right cat id..
-            });
-          }
-        );
-      },
-      () => {
-        this.alertCtrl
-          .create({
-            header: "Failure",
-            message: "Some error happend try again later",
-            buttons: ["Ok"],
-          })
-          .then((el) => el.present());
-      }
-    );
-  }
-
   onEdit(id) {
     this.navCtrl.navigateForward(`ufarm/farms/sell/${id}`);
   }
 
   onDelete(id, slidingItem: IonItemSliding) {
     this.isLoading = true;
-    this.sellService.deleteItem(id).subscribe(
-      (resData) => {
+    this.delSub = this.sellService.deleteItem(id).subscribe(
+      (_) => {
         this.isLoading = false;
         slidingItem.close();
       },
-      (err) => (this.isLoading = false)
+      (_) => (this.isLoading = false)
     );
+  }
+
+  ngOnDestroy() {
+    if (this.delSub) {
+      this.delSub.unsubscribe();
+    }
   }
 }

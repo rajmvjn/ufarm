@@ -11,6 +11,7 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
+  HttpCode,
 } from '@nestjs/common';
 import {
   ApiOperation,
@@ -24,7 +25,7 @@ import { Response } from 'express';
 import { diskStorage, MulterFile } from 'multer';
 
 import { UserService } from './user.service';
-import { UserDto } from './dto/user-dto';
+import { UserDto, AuthUserDto } from './dto/user-dto';
 import { IUser } from './interfaces/user.interface';
 import { SellerRequestDto } from './dto/seller-request.dto';
 import { ISellerRequest } from './interfaces/seller-request.interface';
@@ -61,6 +62,18 @@ export class UserController {
   @ApiConsumes('multipart/form-data')
   @ApiUser('profile_image')
   @ApiResponse({ status: HttpStatus.CREATED, description: constants.created })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async createUser(
     @Body() createUserDto: UserDto,
     @UploadedFile() profileImage: MulterFile,
@@ -103,6 +116,18 @@ export class UserController {
   @ApiConsumes('multipart/form-data')
   @ApiUser('profile_image')
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async updateUser(
     @Body() updateUserDto: UserDto,
     @UploadedFile() profileImage: MulterFile,
@@ -122,6 +147,18 @@ export class UserController {
   @ApiTags('User')
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getAll(): Promise<IUser[]> {
     return this.userService.getAllUser();
   }
@@ -133,12 +170,22 @@ export class UserController {
   @Post('auth')
   @ApiTags('User')
   @ApiOperation({ summary: 'get user authenticated' })
-  @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
-  public async getUserAuth(
-    @Body() user: { email: string; password: string },
-  ): Promise<IUser> {
-    console.log(user);
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
+  @HttpCode(200)
+  public async getUserAuth(@Body() user: AuthUserDto): Promise<IUser> {
+    Logger.log(JSON.stringify(user));
     return this.userService.getUserAuthenticated(user);
   }
 
@@ -150,6 +197,18 @@ export class UserController {
   @ApiTags('User')
   @ApiOperation({ summary: 'Get user by Id' })
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getUser(@Param('userId') userId: string): Promise<IUser> {
     return this.userService.getUser(userId);
   }
@@ -165,6 +224,18 @@ export class UserController {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: constants.no_content,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
   })
   public async deleteUser(
     @Param('userId') userId: string,
@@ -191,6 +262,18 @@ export class UserController {
   @ApiOperation({ summary: 'Create seller request' })
   @ApiResponse({ status: HttpStatus.OK, type: SellerRequestDto })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Created' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async createSellerRequest(
     @Body() createSellerDto: SellerRequestDto,
     @Res() response: Response,
@@ -218,6 +301,18 @@ export class UserController {
   @ApiTags('Seller Request')
   @ApiOperation({ summary: 'Update seller request based on req id' })
   @ApiResponse({ status: HttpStatus.OK, type: SellerRequestDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async updateSellerRequest(
     @Body() updateSellerDto: SellerRequestDto,
     @Param('reqId') reqId: string,
@@ -233,6 +328,18 @@ export class UserController {
   @ApiTags('Seller Request')
   @ApiOperation({ summary: 'Get all seller requests' })
   @ApiResponse({ status: HttpStatus.OK, type: SellerRequestDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getAllRequest(): Promise<ISellerRequest[]> {
     return this.userService.getAllRequest();
   }
@@ -245,6 +352,18 @@ export class UserController {
   @ApiTags('Seller Request')
   @ApiOperation({ summary: 'Get seller request by Id' })
   @ApiResponse({ status: HttpStatus.OK, type: SellerRequestDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getSellerRequest(
     @Param('reqId') reqId: string,
   ): Promise<ISellerRequest> {
@@ -260,6 +379,18 @@ export class UserController {
   @ApiTags('Seller Request')
   @ApiOperation({ summary: 'Delete seller request by Id' })
   @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'No Content' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async deleteSellerRequest(
     @Param('reqId') reqId: string,
     @Res() response: Response,

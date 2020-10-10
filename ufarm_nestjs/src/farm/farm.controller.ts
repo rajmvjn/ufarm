@@ -61,6 +61,18 @@ export class FarmController {
   @ApiConsumes('multipart/form-data')
   @ApiFarmProduct('product_image')
   @ApiResponse({ status: HttpStatus.CREATED, description: constants.created })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async createFarmProduct(
     @Body() createFarmProductDto: FarmDto,
     @UploadedFile() productImage: MulterFile,
@@ -102,6 +114,18 @@ export class FarmController {
   @ApiFarmProduct('product_image')
   @ApiOperation({ summary: 'Update Farm Product' })
   @ApiResponse({ status: HttpStatus.OK, type: FarmDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async updateFarmProduct(
     @Body() updateFarmProductDto: FarmDto,
     @UploadedFile() productImage: MulterFile,
@@ -121,6 +145,18 @@ export class FarmController {
   @ApiTags('Farm')
   @ApiOperation({ summary: 'Get all farm products' })
   @ApiResponse({ status: HttpStatus.OK, type: FarmDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getAll(): Promise<IFarm[]> {
     return this.farmService.getAll();
   }
@@ -133,6 +169,18 @@ export class FarmController {
   @ApiTags('Farm')
   @ApiOperation({ summary: 'Get farm product detail by Id' })
   @ApiResponse({ status: HttpStatus.OK, type: FarmDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getFarmProduct(@Param('farmId') farmId: string): Promise<IFarm> {
     return this.farmService.getFarmProductById(farmId);
   }
@@ -148,6 +196,18 @@ export class FarmController {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: constants.no_content,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
   })
   public async deleteFarmProduct(
     @Param('farmId') farmId: string,
@@ -176,6 +236,18 @@ export class FarmController {
   @ApiTags('Farm Support')
   @ApiOperation({ summary: 'Create Farm support request' })
   @ApiResponse({ status: HttpStatus.CREATED, description: constants.created })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async createFarmSupportRequest(
     @Body() createFarmSupportRequestDto: FarmSupportDto,
     @Res() response: Response,
@@ -203,6 +275,18 @@ export class FarmController {
   @ApiTags('Farm Support')
   @ApiOperation({ summary: 'Update Farm support' })
   @ApiResponse({ status: HttpStatus.OK, type: FarmDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async updateFarmSupport(
     @Body() updateFarmSupportDto: FarmSupportDto,
     @Param('farmSupportId') farmSupportId: string,
@@ -221,6 +305,18 @@ export class FarmController {
   @ApiTags('Farm Support')
   @ApiOperation({ summary: 'Get all farm supports' })
   @ApiResponse({ status: HttpStatus.OK, type: FarmSupportDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getAllFarmSupport(): Promise<IFarmSupport[]> {
     return this.farmService.getAllFarmSupport();
   }
@@ -233,6 +329,18 @@ export class FarmController {
   @ApiTags('Farm Support')
   @ApiOperation({ summary: 'Get farm support detail by Id' })
   @ApiResponse({ status: HttpStatus.OK, type: FarmSupportDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getFarmSupport(
     @Param('farmSupportId') farmSupportId: string,
   ): Promise<IFarmSupport> {
@@ -250,6 +358,18 @@ export class FarmController {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: constants.no_content,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
   })
   public async deleteFarmSupport(
     @Param('farmSupportId') farmSupportId: string,

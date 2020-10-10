@@ -8,6 +8,8 @@ import { CategoryService } from "../../../admin/category/category.service";
 import { Category } from "../../../admin/category/category.model";
 import { environment } from "../../../../environments/environment";
 import { Subscription } from "rxjs";
+import { AuthService } from "../../../auth/auth.service";
+import constants from "../../../farm-core/constants/constants";
 
 @Component({
   selector: "app-add-farm-detail",
@@ -17,6 +19,7 @@ import { Subscription } from "rxjs";
 export class AddFarmDetailPage implements OnInit, OnDestroy {
   edit_id = "";
   imageUrl = "";
+  user_role = constants.USER_ROLE;
   categories: Category[];
   getCatSub: Subscription;
   addFarmSub: Subscription;
@@ -70,7 +73,8 @@ export class AddFarmDetailPage implements OnInit, OnDestroy {
     private farmService: FarmService,
     private navCtrl: NavController,
     private route: ActivatedRoute,
-    private catService: CategoryService
+    private catService: CategoryService,
+    public authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -122,6 +126,7 @@ export class AddFarmDetailPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    console.log("add farm destroy..");
     if (this.getCatSub) {
       this.getCatSub.unsubscribe();
     }

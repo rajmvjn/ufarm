@@ -13,6 +13,10 @@
 </ion-header>
 
 <ion-content>
+  <ion-button size="small" color="warning" (click)="onBuyNow()">
+    Buy Now
+    <ion-icon slot="end" name="cart-outline"></ion-icon>
+  </ion-button>
   <ion-grid>
     <ion-row>
       <ion-col class="ion-padding-vertical">
@@ -58,7 +62,6 @@
 
     <ion-row>
       <ion-col size-sm="6" offset-sm="3">
-        <ion-label position="floating"> Image </ion-label>
         <app-image-picker
           [imageUrl]="imageUrl"
           [showPreview]="item.image_url"

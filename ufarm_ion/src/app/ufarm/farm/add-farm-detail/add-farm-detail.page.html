@@ -5,7 +5,10 @@
     </ion-buttons>
     <ion-title> {{ edit_id? "Edit" : "Add" }} Farm Item</ion-title>
 
-    <ion-buttons slot="primary">
+    <ion-buttons
+      slot="primary"
+      *ngIf="authService.get_user_role_sub.getValue() === user_role.admin"
+    >
       <ion-button (click)="onAddFarmItem()">
         <ion-icon name="checkmark" slot="icon-only"></ion-icon>
       </ion-button>

@@ -42,10 +42,10 @@ export class AuthPage implements OnInit {
         this.profileService.setProfileAfterAuth(profile[0]);
         this.authService.isuser_authenticated = true;
         if (profile[0].admin) {
-          this.authService.user_role = constants.USER_ROLE.admin;
+          this.authService.user_role_sub = constants.USER_ROLE.admin;
           this.navCtrl.navigateForward("/admin/admins/farm");
         } else {
-          this.authService.user_role = constants.USER_ROLE.customer;
+          this.authService.user_role_sub = constants.USER_ROLE.customer;
           this.navCtrl.navigateForward("/ufarm/farms/buy");
         }
       } else {

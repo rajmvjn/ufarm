@@ -6,6 +6,7 @@ import { HttpClient } from "@angular/common/http";
 
 import { Profile } from "./profile.model";
 import { environment } from "../../environments/environment";
+import { StorageService } from "../farm-core/localstorage/storage-service";
 
 @Injectable({
   providedIn: "root",
@@ -15,13 +16,23 @@ export class ProfileService {
   private _profile = new ReplaySubject<Profile>(1); // profile will set on the auth, other sub will get later when they subscribe
   profileEditAdd: Observable<Profile>;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private storageService: StorageService
+  ) {
+    //fetch from local storage to get logged in user data in refresh and clear the same on logout..
+  }
 
   get profile(): Observable<Profile> {
     return this._profile.asObservable();
   }
 
   setProfileAfterAuth(profile: Profile | any) {
+    this.storageService.setStorageData({
+      key: "loggedInUserProfile",
+      value: JSON.stringify(profile),
+    });
+
     if (profile.address && typeof profile.address !== "object") {
       profile.address = JSON.parse(profile.address);
     }

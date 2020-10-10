@@ -6,6 +6,7 @@ import { ProfileService } from "./profile.service";
 import { SharedService } from "../shared/shared-service";
 import { environment } from "../../environments/environment";
 import { Subscription } from "rxjs";
+import constants from "../farm-core/constants/constants";
 
 @Component({
   selector: "app-profile",
@@ -49,6 +50,7 @@ export class ProfilePage implements OnInit, OnDestroy {
     admin: new FormControl(false),
     status: new FormControl(true),
     sell: new FormControl(false),
+    role: new FormControl(constants.USER_ROLE.customer),
     _id: new FormControl(null),
   });
 

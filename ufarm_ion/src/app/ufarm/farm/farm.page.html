@@ -6,7 +6,7 @@
     <ion-title>Farm</ion-title>
     <ion-buttons slot="primary">
       <ion-button
-        *ngIf="authService.user_role === user_role.admin"
+        *ngIf="authService.get_user_role_sub.getValue() === user_role.admin"
         routerLink="/admin/admins/farm/add"
       >
         <ion-icon name="add" slot="icon-only"></ion-icon>

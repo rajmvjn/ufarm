@@ -34,10 +34,12 @@ export class FarmPage implements OnInit, OnDestroy {
   ngOnInit() {
     //Fetch categories for both admin and customers get the rxjs subscriptions ready for the app..
 
+    console.log("farm init");
+
     this.fetchAllSub = this.farmService.fetchAllFarmItems().subscribe(() => {
       this.farmItemSub = this.farmService.farm_item.subscribe((farmItems) => {
         this.itemsUnFiltered = farmItems;
-        this.catService.categories.subscribe((cats) => {
+        this.catSub = this.catService.categories.subscribe((cats) => {
           this.onCategoryChange(null, cats[0]._id); // fetch only on load and get the right cat id..
         });
         console.log(farmItems);
@@ -52,11 +54,23 @@ export class FarmPage implements OnInit, OnDestroy {
     );
   }
 
+  ionViewWillEnter() {
+    console.log("fuck man");
+    this.onCategoryChange(null, "5f460b322491f911c896c64f");
+  }
+
   onEdit(_id: string) {
-    this.navCtrl.navigateForward(`/admin/admins/farm/edit/${_id}`);
+    if (
+      this.authService.get_user_role_sub.getValue() === this.user_role.admin
+    ) {
+      this.navCtrl.navigateForward(`/admin/admins/farm/edit/${_id}`);
+    } else {
+      this.navCtrl.navigateForward(`/ufarm/farms/farm/${_id}`);
+    }
   }
 
   ngOnDestroy() {
+    console.log("farm destroyed");
     if (this.catSub) {
       this.catSub.unsubscribe();
     }

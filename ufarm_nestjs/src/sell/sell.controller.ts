@@ -89,6 +89,18 @@ export class SellController {
    */
   @Put('sell/:itemId')
   @ApiOperation({ summary: 'Update sell item based on item id' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: SellDto })
   @UseInterceptors(
     FileInterceptor('sell_image', {
@@ -118,6 +130,18 @@ export class SellController {
    */
   @Get('sell')
   @ApiOperation({ summary: 'Get all items' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: SellDto })
   public async getAll(): Promise<ISell[]> {
     return this.sellService.getAllItems();
@@ -130,6 +154,18 @@ export class SellController {
   @Get('sell/:itemId')
   @ApiOperation({ summary: 'Get item by Id' })
   @ApiResponse({ status: HttpStatus.OK, type: SellDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async getSell(@Param('itemId') itemId: string): Promise<ISell> {
     return this.sellService.getItem(itemId);
   }
@@ -145,6 +181,18 @@ export class SellController {
     status: HttpStatus.NO_CONTENT,
     description: constants.no_content,
   })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async deleteItem(
     @Param('itemId') itemId: string,
     @Res() response: Response,
@@ -159,5 +207,55 @@ export class SellController {
         message: sell_module_content.sell_add_success_message,
       });
     });
+  }
+
+  /**
+   * Function to get sell item based on the seller id
+   *
+   */
+  @Get('sell-items/:sellerId')
+  @ApiOperation({ summary: 'Get Seller items' })
+  @ApiResponse({ status: HttpStatus.OK, type: SellDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
+  public async getSellerItems(
+    @Param('sellerId') sellerId: string,
+  ): Promise<ISell[]> {
+    return this.sellService.getSellerItems(sellerId);
+  }
+
+  /**
+   * Function to get buy items other than seller item
+   *
+   */
+  @Get('buy-items/:sellerId')
+  @ApiOperation({ summary: 'Get Buyer items' })
+  @ApiResponse({ status: HttpStatus.OK, type: SellDto })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
+  public async getBuyerItems(
+    @Param('sellerId') sellerId: string,
+  ): Promise<ISell[]> {
+    return this.sellService.getBuyerItems(sellerId);
   }
 }

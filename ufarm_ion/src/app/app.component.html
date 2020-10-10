@@ -19,35 +19,64 @@
         </ion-item>
       </ion-menu-toggle>
       <ion-menu-toggle>
-        <ion-item lines="none" routerLink="/ufarm/farms/farm">
+        <ion-item
+          lines="none"
+          routerLink="{{
+            userRole === userRoles.admin
+              ? 'admin/admins/farm'
+              : '/ufarm/farms/farm'
+          }}"
+        >
           <ion-icon name="business" slot="start"></ion-icon>
           <ion-label> Farm </ion-label>
         </ion-item>
       </ion-menu-toggle>
-      <ion-menu-toggle>
+      <ion-menu-toggle *ngIf="userRole !== userRoles.admin">
         <ion-item lines="none" routerLink="/ufarm/farms/buy">
           <ion-icon name="basket-outline" slot="start"></ion-icon>
           <ion-label> Buy </ion-label>
         </ion-item>
       </ion-menu-toggle>
-      <ion-menu-toggle>
+      <ion-menu-toggle *ngIf="userRole !== userRoles.admin">
         <ion-item lines="none" routerLink="/ufarm/farms/sell">
           <ion-icon name="navigate-circle-outline" slot="start"></ion-icon>
           <ion-label> Sell </ion-label>
         </ion-item>
       </ion-menu-toggle>
-      <ion-menu-toggle>
+      <ion-menu-toggle *ngIf="userRole !== userRoles.admin">
         <ion-item lines="none" routerLink="/ufarm/farms/cart">
           <ion-icon name="cart-outline" slot="start"></ion-icon>
           <ion-label> Cart </ion-label>
         </ion-item>
       </ion-menu-toggle>
-      <ion-menu-toggle>
+      <ion-menu-toggle *ngIf="userRole !== userRoles.admin">
         <ion-item lines="none" routerLink="/ufarm/farms/orders">
           <ion-icon name="reorder-three-outline" slot="start"></ion-icon>
           <ion-label> Orders </ion-label>
         </ion-item>
       </ion-menu-toggle>
+
+      <!-- Admin menu options follows-->
+
+      <ion-menu-toggle *ngIf="userRole === userRoles.admin">
+        <ion-item lines="none" routerLink="admin/admins/farm-support">
+          <ion-icon name="reorder-three-outline" slot="start"></ion-icon>
+          <ion-label> Support </ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+      <ion-menu-toggle *ngIf="userRole === userRoles.admin">
+        <ion-item lines="none" routerLink="admin/admins/category">
+          <ion-icon name="reorder-three-outline" slot="start"></ion-icon>
+          <ion-label> Category </ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+      <ion-menu-toggle *ngIf="userRole === userRoles.admin">
+        <ion-item lines="none" routerLink="admin/admins/seller-activation">
+          <ion-icon name="reorder-three-outline" slot="start"></ion-icon>
+          <ion-label> Users </ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
       <ion-menu-toggle>
         <ion-item lines="none" (click)="onLogout()" button>
           <ion-icon name="log-out-outline" slot="start"></ion-icon>
