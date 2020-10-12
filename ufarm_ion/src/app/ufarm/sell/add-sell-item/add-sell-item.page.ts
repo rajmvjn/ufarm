@@ -13,6 +13,7 @@ import { FarmItem } from "../../farm/farm.model";
 import { ImageService } from "../../../shared/services/image/image.service";
 import { ProfileService } from "../../../profile/profile.service";
 import { Subscription } from "rxjs";
+import { LoggerService } from "../../../shared/services/logger/logger.service";
 
 @Component({
   selector: "app-add-sell-item",
@@ -27,6 +28,7 @@ export class AddSellItemPage implements OnInit, OnDestroy {
   showPreview: string;
   editItemId: string;
   allSubs: Subscription[] = [];
+  farm_id_temp: string;
 
   sellItemForm = new FormGroup({
     farm_id: new FormControl(null, {
@@ -67,7 +69,8 @@ export class AddSellItemPage implements OnInit, OnDestroy {
     public catService: CategoryService,
     public farmService: FarmService,
     public navCtrl: NavController,
-    private profileService: ProfileService
+    private profileService: ProfileService,
+    private loggerService: LoggerService
   ) {}
 
   ngOnInit() {
@@ -85,7 +88,7 @@ export class AddSellItemPage implements OnInit, OnDestroy {
               .subscribe((sellItem) => {
                 this.imageUrl = environment.ImagesURL;
                 this.showPreview = sellItem.image_url;
-
+                //this.loggerService.log(sellItem);
                 farmItems.forEach((farmItem) => {
                   if (farmItem._id === sellItem.farm_id) {
                     this.allowed_price_diff = farmItem.allowed_price_diff;
@@ -121,6 +124,10 @@ export class AddSellItemPage implements OnInit, OnDestroy {
       newItem._id = this.editItemId;
     }
 
+    if (!newItem.farm_id) {
+      newItem.farm_id = this.farm_id_temp;
+    }
+
     this.allSubs[5] = this.sellService.addorEditSell(newItem).subscribe((_) => {
       this.navCtrl.navigateBack("/ufarm/farms/sell");
     });
@@ -133,7 +140,6 @@ export class AddSellItemPage implements OnInit, OnDestroy {
         this.allSubs[7] = this.farmService
           .getFarmItemsByCategory(val)
           .subscribe((farmItems) => {
-            console.log("sub1");
             this.farmItemByCat = farmItems;
           });
       });
@@ -147,7 +153,9 @@ export class AddSellItemPage implements OnInit, OnDestroy {
           const addedSell = sellItem.filter((s) => s.farm_id === val);
           if (addedSell.length) {
             this.editItemId = addedSell[0]._id;
+            //taking off farm_id to stope update loop
             let { category_id, farm_id, ...formDataEdit } = { ...addedSell[0] };
+            this.farm_id_temp = farm_id;
 
             this.farmItemByCat.filter((farmItem) => {
               if (farmItem._id === val) {
@@ -219,7 +227,6 @@ export class AddSellItemPage implements OnInit, OnDestroy {
     console.log("add sell destroy");
     if (this.allSubs.length) {
       this.allSubs.forEach((sub) => {
-        //console.log(sub);
         sub.unsubscribe();
       });
     }

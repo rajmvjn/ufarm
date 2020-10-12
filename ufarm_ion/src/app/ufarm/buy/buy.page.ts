@@ -8,6 +8,8 @@ import { environment } from "../../../environments/environment";
 import { Profile } from "../../profile/profile.model";
 import { ProfileService } from "../../profile/profile.service";
 import { FarmService } from "../farm/farm.service";
+import { LoggerService } from "../../shared/services/logger/logger.service";
+import { NetworkService } from "../../shared/services/network/network.service";
 
 @Component({
   selector: "app-buy",
@@ -31,7 +33,9 @@ export class BuyPage implements OnInit, OnDestroy {
     private catService: CategoryService,
     private navCtrl: NavController,
     private profileService: ProfileService,
-    private farmService: FarmService
+    private farmService: FarmService,
+    private loggerService: LoggerService,
+    private networkService: NetworkService
   ) {}
 
   ngOnInit() {
@@ -42,6 +46,10 @@ export class BuyPage implements OnInit, OnDestroy {
     this.fetchAllSub$ = this.farmService.fetchAllFarmItems().subscribe(() => {
       this.fetchItems();
     });
+
+    // this.networkService._network_status_sub.subscribe((status) =>
+    //   this.loggerService.log(status)
+    // );
   }
 
   onCategoryChange(event: CustomEvent, cat_id?: string) {
@@ -67,8 +75,10 @@ export class BuyPage implements OnInit, OnDestroy {
   }
 
   onDetails(item_id: string) {
+    //this.loggerService.log(item_id);
     this.navCtrl.navigateForward(`ufarm/farms/buy/${item_id}`);
   }
+
   onAddCart(item_id: string, element: IonItemSliding) {}
 
   ngOnDestroy() {

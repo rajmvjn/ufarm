@@ -9,6 +9,14 @@ export const environment = {
   //BaseURL: "https://ufarm-app.herokuapp.com/api/",
   ImagesURL: "http://localhost:3000/api/images/",
   //ImagesURL: "https://ufarm-app.herokuapp.com/api/images/",
+
+  logger: {
+    log: true,
+    error: true,
+    warn: true,
+    debug: true,
+    trace: true,
+  },
 };
 
 /*

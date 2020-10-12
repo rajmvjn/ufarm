@@ -36,16 +36,19 @@ export class SellService {
     );
   }
 
-  fetchBuyItems(id: string): Observable<SellItem[]> {
-    return this.http.get<SellItem[]>(`${this.BaseURL}v1/buy-items/${id}`).pipe(
-      take(1),
-      tap((items) => {
-        this._buy_items.next(items);
-      })
-    );
+  fetchBuyItems(logged_in_userid: string): Observable<SellItem[]> {
+    return this.http
+      .get<SellItem[]>(`${this.BaseURL}v1/buy-items/${logged_in_userid}`)
+      .pipe(
+        take(1),
+        tap((items) => {
+          this._buy_items.next(items);
+        })
+      );
   }
 
   addorEditSell(sellItem: SellItem) {
+    console.log(sellItem);
     let _id: string;
     let imageUrl: string;
     let formData = new FormData();
@@ -70,14 +73,14 @@ export class SellService {
       this.editItemId = sellItem._id;
       this.editAddItemObs = this.http.put<SellItem>(
         `${this.BaseURL}v1/sell/${sellItem._id}`,
-        sellItem
+        formData
       );
     } else {
       //add
       this.editItemId = "";
       this.editAddItemObs = this.http.post<SellItem>(
         `${this.BaseURL}v1/sell`,
-        sellItem
+        formData
       );
     }
 
@@ -93,6 +96,7 @@ export class SellService {
         if (this.editItemId) {
           sellItems.map((sellItemEdit, index) => {
             if (sellItemEdit._id === this.editItemId) {
+              sellItem.image_url = imageUrl;
               sellItems[index] = { ...sellItem };
             }
           });
@@ -125,6 +129,15 @@ export class SellService {
       take(1),
       switchMap((sellItems) => {
         return sellItems.filter((sellItem) => sellItem._id === id);
+      })
+    );
+  }
+
+  getBuyItemById(id: string) {
+    return this.buyItems.pipe(
+      take(1),
+      switchMap((buyItems) => {
+        return buyItems.filter((buyItem) => buyItem._id === id);
       })
     );
   }

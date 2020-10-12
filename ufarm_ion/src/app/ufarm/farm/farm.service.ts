@@ -46,7 +46,6 @@ export class FarmService {
   }
 
   addFarmItem(farmItem: FarmItem) {
-    console.log(farmItem);
     let formData = new FormData();
     farmItem.status = true;
     farmItem.date = new Date();

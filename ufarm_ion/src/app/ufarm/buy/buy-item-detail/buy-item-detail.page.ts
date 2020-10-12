@@ -36,15 +36,13 @@ export class BuyItemDetailPage implements OnInit {
       if (paramMap.has("buyItemId")) {
         this.buyItemId = paramMap.get("buyItemId");
 
-        this.sellService
-          .getSellItemById(this.buyItemId)
-          .subscribe((buyItem) => {
-            this.item = buyItem;
-            this.showPreview = buyItem.image_url;
-            this.farmService
-              .getFarmItem(buyItem.farm_id)
-              .subscribe((farmItem) => (this.farmItem = farmItem));
-          });
+        this.sellService.getBuyItemById(this.buyItemId).subscribe((buyItem) => {
+          this.item = buyItem;
+          this.showPreview = buyItem.image_url;
+          this.farmService
+            .getFarmItem(buyItem.farm_id)
+            .subscribe((farmItem) => (this.farmItem = farmItem));
+        });
       }
     });
   }
