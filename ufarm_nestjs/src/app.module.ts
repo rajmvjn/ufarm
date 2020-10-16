@@ -13,6 +13,7 @@ import { UserModule } from './user/user.module';
 import { SellModule } from './sell/sell.module';
 import { CartModule } from './cart/cart.module';
 import config from './config/configuration';
+import { FirestoreService } from './firestore/firestore.service';
 
 @Module({
   controllers: [AppController],
@@ -46,5 +47,6 @@ import config from './config/configuration';
       useNewUrlParser: true,
     }),
   ],
+  providers: [FirestoreService],
 })
 export class AppModule {}

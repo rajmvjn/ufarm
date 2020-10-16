@@ -38,4 +38,12 @@ export class FarmSupportDto {
   @IsDefined()
   @IsString()
   readonly name: string;
+
+  @ApiProperty()
+  @IsOptional()
+  date_created: any;
+
+  @ApiProperty()
+  @IsOptional()
+  date_updated: any;
 }

@@ -1,6 +1,4 @@
-import * as mongoose from 'mongoose';
-
-export interface IUser extends mongoose.Document {
+export interface IUser {
   name: string;
   phone: string;
   email: string;
@@ -10,8 +8,12 @@ export interface IUser extends mongoose.Document {
   pincode: number;
   avatar: string;
   status: boolean;
-  date_created: Date;
+  date_created?: string;
+  date_updated?: string;
   sell?: boolean;
   admin?: boolean;
   role?: string;
+  id?: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  data?: () => {};
 }

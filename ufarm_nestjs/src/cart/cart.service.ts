@@ -1,21 +1,26 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-
-import { Model } from 'mongoose';
 
 import { ICart } from './interfaces/cart.interface';
 import { CartDto } from './dto/cart-dto';
+import { FirestoreService } from '../firestore/firestore.service';
+import * as admin from 'firebase-admin';
+import { forkJoin, Observable } from 'rxjs';
 
 @Injectable()
 export class CartService {
-  constructor(@InjectModel('Cart') private readonly cartModel: Model<ICart>) {}
+  private cartCollection: any;
+  private sellItemCollection: any;
+  constructor(private readonly firestoreService: FirestoreService) {
+    this.cartCollection = admin.firestore().collection('cart');
+    this.sellItemCollection = admin.firestore().collection('sell_item');
+  }
 
   /**
    * Function to return the list of cart
    */
   public async getAllCart(): Promise<ICart[]> {
     Logger.log('Inside get all cart service');
-    return await this.cartModel.find().exec();
+    return await this.cartCollection.get();
   }
 
   /**
@@ -24,8 +29,8 @@ export class CartService {
    */
   public async createCart(cartReq: CartDto): Promise<ICart> {
     Logger.log('Inside create cart service', JSON.stringify(cartReq));
-    const cart = await this.cartModel(cartReq);
-    return cart.save();
+    cartReq.date_created = this.firestoreService.timestamp();
+    return await this.cartCollection.add(Object.assign({}, cartReq));
   }
 
   /**
@@ -38,9 +43,9 @@ export class CartService {
       `Inside get update cart service: ${cartId}`,
       JSON.stringify(cartReq),
     );
-    return await this.cartModel.findByIdAndUpdate(cartId, cartReq, {
-      new: true,
-    });
+    return await this.cartCollection
+      .doc(cartId)
+      .update(Object.assign({}, cartReq));
   }
 
   /**
@@ -49,7 +54,7 @@ export class CartService {
    */
   public async getCart(cartId: string): Promise<ICart> {
     Logger.log(`Inside get cart by id service: ${cartId}`);
-    return await this.cartModel.findById(cartId).exec();
+    return await this.cartCollection.doc(cartId).get();
   }
 
   /**
@@ -58,7 +63,7 @@ export class CartService {
    */
   public async getCartByStatus(status: string): Promise<ICart> {
     Logger.log(`Inside get cart by status service: ${status}`);
-    return await this.cartModel.find({ status }).exec();
+    return await this.cartCollection.where('status', '==', status).get();
   }
 
   /**
@@ -67,6 +72,27 @@ export class CartService {
    */
   public async deleteCart(cartId: string): Promise<string> {
     Logger.log(`Inside delete cart by id service: ${cartId}`);
-    return await this.cartModel.findByIdAndRemove(cartId).exec();
+    return await this.cartCollection.doc(cartId).delete();
+  }
+
+  /**
+   * Function to get cart item based on buyer id
+   * @param buyerId: string
+   */
+  public async getBuyerCartItems(buyerId: string): Promise<ICart> {
+    Logger.log(`Inside getBuyerCartItems service: ${buyerId}`);
+    return await this.cartCollection.where('buy_user_id', '==', buyerId).get();
+  }
+
+  /**
+   * Function to get product detail based on the item id
+   * @param itemIds: string[]
+   */
+  public getProductDetails(itemIds: string[]): Observable<any> {
+    Logger.log(`Inside getProductDetails service: ${JSON.stringify(itemIds)}`);
+    const sellItems = itemIds.map(itemId =>
+      this.sellItemCollection.doc(itemId).get(),
+    );
+    return forkJoin(sellItems);
   }
 }

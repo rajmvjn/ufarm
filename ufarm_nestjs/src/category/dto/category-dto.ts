@@ -4,10 +4,6 @@ import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class CategoryDto {
   @ApiProperty()
-  @IsOptional()
-  readonly cat_id: string;
-
-  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   readonly name: string;
@@ -19,6 +15,14 @@ export class CategoryDto {
   @ApiProperty()
   @IsOptional()
   image_url: string;
+
+  @ApiProperty()
+  @IsOptional()
+  date_created: any;
+
+  @ApiProperty()
+  @IsOptional()
+  date_updated: any;
 
   @ApiProperty()
   @IsOptional()

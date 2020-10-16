@@ -30,6 +30,8 @@ async function bootstrap() {
     }),
   );
 
+  // Set the config options
+
   //set api prefix
   app.setGlobalPrefix('api');
 

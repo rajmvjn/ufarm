@@ -1,21 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-
-import { Model } from 'mongoose';
 
 import { ISell } from './interfaces/sell.interface';
 import { SellDto } from './dto/sell-dto';
+import { FirestoreService } from '../firestore/firestore.service';
+import * as admin from 'firebase-admin';
 
 @Injectable()
 export class SellService {
-  constructor(@InjectModel('Sell') private readonly sellModel: Model<ISell>) {}
+  private sellItemCollection: any;
+  constructor(private readonly firestoreService: FirestoreService) {
+    this.sellItemCollection = admin.firestore().collection('sell_item');
+  }
 
   /**
    * Function to return the list of items
    */
   public async getAllItems(): Promise<ISell[]> {
     Logger.log('Inside get all items service');
-    return await this.sellModel.find().exec();
+    return await this.sellItemCollection.get();
   }
 
   /**
@@ -23,9 +25,9 @@ export class SellService {
    * @param sellReq: SellDto
    */
   public async createItem(sellReq: SellDto): Promise<ISell> {
+    sellReq.date_created = this.firestoreService.timestamp();
     Logger.log('Inside create item service', JSON.stringify(sellReq));
-    const sell = await this.sellModel(sellReq);
-    return sell.save();
+    return await this.sellItemCollection.add(Object.assign({}, sellReq));
   }
 
   /**
@@ -38,9 +40,9 @@ export class SellService {
       `Inside get update item service: ${itemId}`,
       JSON.stringify(sellReq),
     );
-    return await this.sellModel.findByIdAndUpdate(itemId, sellReq, {
-      new: true,
-    });
+    return await this.sellItemCollection
+      .doc(itemId)
+      .update(Object.assign({}, sellReq));
   }
 
   /**
@@ -49,7 +51,7 @@ export class SellService {
    */
   public async getItem(itemId: string): Promise<ISell> {
     Logger.log(`Inside get itemId service: ${itemId}`);
-    return await this.sellModel.findById(itemId).exec();
+    return await this.sellItemCollection.doc(itemId).get();
   }
 
   /**
@@ -58,24 +60,26 @@ export class SellService {
    */
   public async deleteItem(itemId: string): Promise<string> {
     Logger.log(`Inside delete sell by id service: ${itemId}`);
-    return await this.sellModel.findByIdAndRemove(itemId).exec();
+    return await this.sellItemCollection.doc(itemId).delete();
   }
 
   /**
    * Function to return the list of seller items
    */
-  public async getSellerItems(sellerId: string): Promise<ISell[]> {
+  public async getSellerItems(sellerId: string): Promise<any> {
     Logger.log('Inside get Seller items service', sellerId);
-    return await this.sellModel.find({ sell_user_id: sellerId }).exec();
+    return await this.sellItemCollection
+      .where('sell_user_id', '==', sellerId)
+      .get();
   }
 
   /**
    * Function to return the list of buyer items
    */
-  public async getBuyerItems(sellerId: string): Promise<ISell[]> {
+  public async getBuyerItems(sellerId: string): Promise<any> {
     Logger.log('Inside get Buyer items service', sellerId);
-    return await this.sellModel
-      .find({ sell_user_id: { $ne: sellerId } })
-      .exec();
+    return await this.sellItemCollection
+      .where('sell_user_id', '!=', sellerId)
+      .get();
   }
 }

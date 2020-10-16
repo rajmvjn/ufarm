@@ -22,4 +22,12 @@ export class SellerRequestDto {
   @IsNotEmpty()
   @IsString()
   readonly req_user_id: string;
+
+  @ApiProperty()
+  @IsOptional()
+  date_created: any;
+
+  @ApiProperty()
+  @IsOptional()
+  date_updated: any;
 }

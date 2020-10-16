@@ -1,27 +1,28 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 
-import { Model } from 'mongoose';
+import * as admin from 'firebase-admin';
 
 import { IFarm } from './interfaces/farm.interface';
 import { IFarmSupport } from './interfaces/farm-support.interface';
 import { FarmDto } from './dto/farm.dto';
 import { FarmSupportDto } from './dto/farm-support.dto';
+import { FirestoreService } from '../firestore/firestore.service';
 
 @Injectable()
 export class FarmService {
-  constructor(
-    @InjectModel('Farm') private readonly farmModel: Model<IFarm>,
-    @InjectModel('FarmSupport')
-    private readonly farmSupportModel: Model<IFarmSupport>,
-  ) {}
+  private farmCollection: any;
+  private farmSupportCollection: any;
+  constructor(private readonly firestoreService: FirestoreService) {
+    this.farmSupportCollection = admin.firestore().collection('farm_support');
+    this.farmCollection = admin.firestore().collection('farm_product');
+  }
 
   /**
    * Function to return the list of farm request
    */
   public async getAll(): Promise<IFarm[]> {
     Logger.log('Inside get all farm request service');
-    return await this.farmModel.find().exec();
+    return await this.farmCollection.get();
   }
 
   /**
@@ -29,9 +30,9 @@ export class FarmService {
    * @param farmerReq: FarmDto
    */
   public async createFarmProduct(farmerReq: FarmDto): Promise<IFarm> {
+    farmerReq.date_created = this.firestoreService.timestamp();
     Logger.log('Inside create Farm Product service', JSON.stringify(farmerReq));
-    const farmProduct = await this.farmModel(farmerReq);
-    return farmProduct.save();
+    return await this.farmCollection.add(Object.assign({}, farmerReq));
   }
 
   /**
@@ -47,9 +48,9 @@ export class FarmService {
       `Inside get update Farm request service: ${farmId}`,
       JSON.stringify(farmReq),
     );
-    return await this.farmModel.findByIdAndUpdate(farmId, farmReq, {
-      new: true,
-    });
+    return await this.farmCollection
+      .doc(farmId)
+      .update(Object.assign({}, farmReq));
   }
 
   /**
@@ -58,7 +59,7 @@ export class FarmService {
    */
   public async getFarmProductById(farmId: string): Promise<IFarm> {
     Logger.log(`Inside get farm request by id service: ${farmId}`);
-    return await this.farmModel.findById(farmId).exec();
+    return await this.farmCollection.doc(farmId).get();
   }
 
   /**
@@ -67,7 +68,7 @@ export class FarmService {
    */
   public async deleteFarmProduct(farmId: string): Promise<string> {
     Logger.log(`Inside delete farm request by id service: ${farmId}`);
-    return await this.farmModel.findByIdAndRemove(farmId).exec();
+    return await this.farmCollection.doc(farmId).delete();
   }
 
   /**
@@ -75,7 +76,7 @@ export class FarmService {
    */
   public async getAllFarmSupport(): Promise<IFarmSupport[]> {
     Logger.log('Inside get all farm support service');
-    return await this.farmSupportModel.find().exec();
+    return await this.farmSupportCollection.get();
   }
 
   /**
@@ -89,8 +90,10 @@ export class FarmService {
       'Inside create Farm support service',
       JSON.stringify(farmerSupportReq),
     );
-    const farmSupport = await this.farmSupportModel(farmerSupportReq);
-    return farmSupport.save();
+    farmerSupportReq.date_created = this.firestoreService.timestamp();
+    return await this.farmSupportCollection.add(
+      Object.assign({}, farmerSupportReq),
+    );
   }
 
   /**
@@ -106,13 +109,9 @@ export class FarmService {
       `Inside get update Farm support service: ${farmSupportId}`,
       JSON.stringify(farmSupportReq),
     );
-    return await this.farmSupportModel.findByIdAndUpdate(
-      farmSupportId,
-      farmSupportReq,
-      {
-        new: true,
-      },
-    );
+    return await this.farmSupportCollection
+      .doc(farmSupportId)
+      .update(Object.assign({}, farmSupportReq));
   }
 
   /**
@@ -123,7 +122,7 @@ export class FarmService {
     farmSupportReq: string,
   ): Promise<IFarmSupport> {
     Logger.log(`Inside get farm request by id service: ${farmSupportReq}`);
-    return await this.farmSupportModel.findById(farmSupportReq).exec();
+    return await this.farmSupportCollection.doc(farmSupportReq).get();
   }
 
   /**
@@ -132,6 +131,6 @@ export class FarmService {
    */
   public async deleteFarmSupport(farmSupportId: string): Promise<string> {
     Logger.log(`Inside delete farm support by id service: ${farmSupportId}`);
-    return await this.farmSupportModel.findByIdAndRemove(farmSupportId).exec();
+    return await this.farmSupportCollection.doc(farmSupportId).delete();
   }
 }

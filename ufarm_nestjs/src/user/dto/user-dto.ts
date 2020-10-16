@@ -5,7 +5,7 @@ import { IsOptional } from 'class-validator';
 export class UserDto {
   @ApiProperty()
   @IsOptional()
-  readonly user_id: string;
+  readonly id: string;
 
   @ApiProperty()
   @IsOptional()
@@ -44,7 +44,11 @@ export class UserDto {
 
   @ApiProperty()
   @IsOptional()
-  readonly date_created: Date;
+  date_created: any;
+
+  @ApiProperty()
+  @IsOptional()
+  date_updated: any;
 
   @ApiProperty()
   readonly sell?: boolean;

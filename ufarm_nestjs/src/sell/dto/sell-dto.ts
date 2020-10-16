@@ -1,13 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import {
-  IsString,
-  IsBoolean,
-  IsOptional,
-  IsDefined,
-  IsNumber,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsString, IsOptional, IsDefined, IsNotEmpty } from 'class-validator';
 
 export class SellDto {
   @ApiProperty()
@@ -27,15 +20,24 @@ export class SellDto {
   readonly farm_id: string;
 
   @ApiProperty()
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
   readonly description: string;
 
   @ApiProperty()
   readonly quantity_available: number;
 
   @ApiProperty()
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
   readonly unit: string;
 
   @ApiProperty()
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
   readonly sell_user_id: string;
 
   @ApiProperty()
@@ -51,5 +53,9 @@ export class SellDto {
 
   @ApiProperty()
   @IsOptional()
-  readonly date_created: Date;
+  date_created: any;
+
+  @ApiProperty()
+  @IsOptional()
+  date_updated: any;
 }

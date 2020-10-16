@@ -1,6 +1,4 @@
-import * as mongoose from 'mongoose';
-
-export interface IFarm extends mongoose.Document {
+export interface IFarm {
   farm_id: string;
   name: string;
   scientific_name: string;
@@ -14,4 +12,9 @@ export interface IFarm extends mongoose.Document {
   base_price: number;
   unit: string;
   allowed_price_diff: number;
+  id?: string;
+  date_created?: any;
+  date_updated?: any;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  data: () => {};
 }

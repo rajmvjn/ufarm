@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 
 import { SellController } from './sell.controller';
 import { SellService } from './sell.service';
-import { SellSchema } from './schemas/sell.schema';
+import { FirestoreService } from '../firestore/firestore.service';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: 'Sell', schema: SellSchema }])],
   controllers: [SellController],
-  providers: [SellService],
+  providers: [SellService, FirestoreService],
   exports: [SellService],
 })
 export class SellModule {}
