@@ -1,6 +1,4 @@
-import * as mongoose from 'mongoose';
-
-export interface ISell extends mongoose.Document {
+export interface ISell {
   name: string;
   category_id: string;
   farm_id: string;
@@ -11,5 +9,9 @@ export interface ISell extends mongoose.Document {
   status: boolean;
   offer_price_percentage: number;
   image_url: string;
-  date_created: Date;
+  date_created: any;
+  date_updated: any;
+  id?: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  data?: () => {};
 }

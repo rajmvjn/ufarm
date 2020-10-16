@@ -25,7 +25,6 @@ import { Response } from 'express';
 
 import { CategoryService } from './category.service';
 import { CategoryDto } from './dto/category-dto';
-import { ICategory } from './interfaces/category.interface';
 import { category_module_content } from './category-module-content';
 import { constants } from '../constants';
 import {
@@ -33,11 +32,16 @@ import {
   editFileName,
 } from '../shared/utils/file-upload.util';
 import { ApiCategory } from './decorators/category-decorator';
+import { processResponse } from 'src/shared/utils/util';
+import { FirestoreService } from '../firestore/firestore.service';
 
 @Controller('v1')
 @ApiTags('Category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(
+    private readonly categoryService: CategoryService,
+    private readonly firestoreService: FirestoreService,
+  ) {}
 
   /**
    * Function to create new category based on the provided data
@@ -84,12 +88,12 @@ export class CategoryController {
       .then(catCreateResponse => {
         Logger.log(
           category_module_content.category_add_success_message,
-          JSON.stringify(catCreateResponse),
+          JSON.stringify(createCategoryDto),
         );
         return response.status(HttpStatus.CREATED).send({
           success: true,
           message: category_module_content.category_add_success_message,
-          _id: catCreateResponse['_id'],
+          _id: catCreateResponse['id'],
           image_url: catCreateResponse.image_url,
         });
       });
@@ -99,6 +103,7 @@ export class CategoryController {
    * Function to update category based on the categoryId
    * @param updateCategoryDto : CategoryDto
    * @param categoryId: string
+   * @param res: Response
    */
   @Put('category/:categoryId')
   @UseInterceptors(
@@ -130,27 +135,44 @@ export class CategoryController {
     @Body() updateCategoryDto: CategoryDto,
     @UploadedFile() catImage: MulterFile,
     @Param('categoryId') categoryId: string,
-  ): Promise<ICategory> {
+    @Res() res: Response,
+  ): Promise<any> {
     if (catImage) {
       updateCategoryDto.image_url = catImage.filename;
     }
-    return this.categoryService.updateCategory(updateCategoryDto, categoryId);
+    updateCategoryDto.date_updated = this.firestoreService.timestamp();
+    return this.categoryService
+      .updateCategory(updateCategoryDto, categoryId)
+      .then(() => {
+        res.send({
+          _id: categoryId,
+          ...updateCategoryDto,
+        });
+      });
   }
 
   /**
    * Function to get all categories
-   *
+   * @param res: Response
    */
   @Get('categories')
   @ApiOperation({ summary: 'Get all categories' })
   @ApiResponse({ status: HttpStatus.OK, type: CategoryDto })
-  public async getAll(): Promise<ICategory[]> {
-    return this.categoryService.getAllCategory();
+  public async getAll(@Res() res: Response): Promise<any> {
+    return this.categoryService.getAllCategory().then(getAllData => {
+      const getAllResult = processResponse(getAllData);
+      Logger.log(
+        category_module_content.get_all_category_success_message,
+        JSON.stringify(getAllResult),
+      );
+      res.send(getAllResult);
+    });
   }
 
   /**
    * Function to get category by Id
    * @param categoryId: string
+   * @param res: Response
    */
   @Get('category/:categoryId')
   @ApiOperation({ summary: 'Get category by Id' })
@@ -169,8 +191,20 @@ export class CategoryController {
   })
   public async getCategory(
     @Param('categoryId') categoryId: string,
-  ): Promise<ICategory[]> {
-    return this.categoryService.getCategory(categoryId);
+    @Res() res: Response,
+  ): Promise<any> {
+    return this.categoryService
+      .getCategory(categoryId)
+      .then(getCategoryData => {
+        Logger.log(
+          category_module_content.get_category_success_message,
+          JSON.stringify(categoryId),
+        );
+        res.send({
+          _id: getCategoryData.id,
+          ...getCategoryData.data(),
+        });
+      });
   }
 
   /**
@@ -200,16 +234,14 @@ export class CategoryController {
     @Param('categoryId') categoryId: string,
     @Res() response: Response,
   ): Promise<Response> {
-    return this.categoryService
-      .deleteCategory(categoryId)
-      .then(deleteCatResponse => {
-        Logger.log(
-          category_module_content.category_delete_success_message,
-          JSON.stringify(deleteCatResponse),
-        );
-        return response
-          .status(HttpStatus.NO_CONTENT)
-          .send(category_module_content.category_delete_success_message);
-      });
+    return this.categoryService.deleteCategory(categoryId).then(() => {
+      Logger.log(
+        category_module_content.category_delete_success_message,
+        JSON.stringify(categoryId),
+      );
+      return response
+        .status(HttpStatus.NO_CONTENT)
+        .send(category_module_content.category_delete_success_message);
+    });
   }
 }

@@ -10,13 +10,14 @@ import {
 
 export class CartDto {
   @ApiProperty()
-  @IsNotEmpty()
-  @IsOptional()
-  readonly cart_id: string;
-
-  @ApiProperty()
   @IsNumber()
   readonly quantity: number;
+
+  @ApiProperty()
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
+  readonly item_id: string;
 
   @ApiProperty()
   @IsDefined()
@@ -38,9 +39,9 @@ export class CartDto {
 
   @ApiProperty()
   @IsOptional()
-  readonly created_on: Date;
+  date_created: any;
 
   @ApiProperty()
   @IsOptional()
-  readonly updated_on: Date;
+  date_updated: any;
 }

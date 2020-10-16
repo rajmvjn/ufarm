@@ -28,24 +28,26 @@ import { UserService } from './user.service';
 import { UserDto, AuthUserDto } from './dto/user-dto';
 import { IUser } from './interfaces/user.interface';
 import { SellerRequestDto } from './dto/seller-request.dto';
-import { ISellerRequest } from './interfaces/seller-request.interface';
 import { user_module_content } from './user-module-content';
 import { constants } from '../constants';
 import {
   imageFileFilter,
   editFileName,
 } from '../shared/utils/file-upload.util';
+import { processResponse } from '../shared/utils/util';
 import { ApiUser } from './decorators/user-decorator';
+import { ISellerRequest } from './interfaces/seller-request.interface';
 
 @Controller('v1')
 export class UserController {
+  public users: IUser[] = [];
   constructor(private readonly userService: UserService) {}
 
   /**
    * Function to create new user based on the provided data
    * @param createUserDto : UserDto
    * @param profileImage: MulterFile
-   * @param response: Response
+   * @param res: Response
    */
   @Post('user')
   @ApiTags('User')
@@ -77,7 +79,7 @@ export class UserController {
   public async createUser(
     @Body() createUserDto: UserDto,
     @UploadedFile() profileImage: MulterFile,
-    @Res() response: Response,
+    @Res() res: Response,
   ): Promise<Response> {
     createUserDto.avatar = profileImage.filename;
     return this.userService
@@ -85,12 +87,12 @@ export class UserController {
       .then(createUserResponse => {
         Logger.log(
           user_module_content.user_create_success_message,
-          JSON.stringify(createUserResponse),
+          JSON.stringify(createUserDto),
         );
-        return response.status(HttpStatus.CREATED).send({
+        return res.status(HttpStatus.CREATED).send({
           success: true,
           message: user_module_content.user_create_success_message,
-          _id: createUserResponse['_id'],
+          _id: createUserResponse['id'],
           avatar: createUserResponse.avatar,
         });
       });
@@ -100,6 +102,8 @@ export class UserController {
    * Function to update user based on the userId
    * @param updateUserDto : UserDto
    * @param userId: string
+   * @param profileImage: MulterFile
+   * @param res: Response
    */
   @Put('user/:userId')
   @ApiTags('User')
@@ -132,16 +136,22 @@ export class UserController {
     @Body() updateUserDto: UserDto,
     @UploadedFile() profileImage: MulterFile,
     @Param('userId') userId: string,
-  ): Promise<IUser> {
+    @Res() res: Response,
+  ): Promise<any> {
     if (profileImage) {
       updateUserDto.avatar = profileImage.filename;
     }
-    return this.userService.updateUser(updateUserDto, userId);
+    this.userService.updateUser(updateUserDto, userId).then(() => {
+      res.send({
+        _id: userId,
+        ...updateUserDto,
+      });
+    });
   }
 
   /**
    * Function to get all users
-   *
+   * @param res: Response
    */
   @Get('users')
   @ApiTags('User')
@@ -159,13 +169,27 @@ export class UserController {
     status: HttpStatus.FORBIDDEN,
     description: 'Forbidden',
   })
-  public async getAll(): Promise<IUser[]> {
-    return this.userService.getAllUser();
+  public async getAll(@Res() res: Response): Promise<any> {
+    this.userService
+      .getAllUser()
+      .then(getAllUsers => {
+        const usersResult = processResponse(getAllUsers) as IUser[];
+        Logger.log(
+          user_module_content.users_get_success_message,
+          JSON.stringify(usersResult),
+        );
+        res.send(usersResult);
+      })
+      .catch(error => {
+        Logger.log(user_module_content.get_users_error_message, error);
+        res.status(400).send('Error in processing user list');
+      });
   }
 
   /**
    * Function to get user by email and password
    * @param userId: string
+   * @param res: Response
    */
   @Post('auth')
   @ApiTags('User')
@@ -180,18 +204,30 @@ export class UserController {
     description: 'Bad Request',
   })
   @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+  })
+  @ApiResponse({
     status: HttpStatus.FORBIDDEN,
     description: 'Forbidden',
   })
-  @HttpCode(200)
-  public async getUserAuth(@Body() user: AuthUserDto): Promise<IUser> {
+  @HttpCode(HttpStatus.OK)
+  public async getUserAuth(
+    @Body() user: AuthUserDto,
+    @Res() res: Response,
+  ): Promise<any> {
     Logger.log(JSON.stringify(user));
-    return this.userService.getUserAuthenticated(user);
+    return this.userService
+      .getUserAuthenticated(user)
+      .then(authenticatedUser => {
+        const data = processResponse(authenticatedUser) as IUser[];
+        res.send(data);
+      });
   }
 
   /**
    * Function to get user by Id
    * @param userId: string
+   * @param res: Response
    */
   @Get('user/:userId')
   @ApiTags('User')
@@ -209,14 +245,26 @@ export class UserController {
     status: HttpStatus.FORBIDDEN,
     description: 'Forbidden',
   })
-  public async getUser(@Param('userId') userId: string): Promise<IUser> {
-    return this.userService.getUser(userId);
+  public async getUser(
+    @Param('userId') userId: string,
+    @Res() res: Response,
+  ): Promise<any> {
+    return this.userService.getUser(userId).then(userData => {
+      Logger.log(
+        `${user_module_content.user_get_success_message}_${userId}`,
+        JSON.stringify(userData.data()),
+      );
+      res.send({
+        _id: userData.id,
+        ...userData.data(),
+      });
+    });
   }
 
   /**
    * Function to delete user by Id
    * @param userId: string
-   * @param response: Response
+   * @param res: Response
    */
   @Delete('user/:userId')
   @ApiTags('User')
@@ -239,14 +287,14 @@ export class UserController {
   })
   public async deleteUser(
     @Param('userId') userId: string,
-    @Res() response: Response,
+    @Res() res: Response,
   ): Promise<Response> {
-    return this.userService.deleteUser(userId).then(deleteUserResponse => {
+    return this.userService.deleteUser(userId).then(() => {
       Logger.log(
         user_module_content.user_delete_success_message,
-        JSON.stringify(deleteUserResponse),
+        JSON.stringify(userId),
       );
-      return response
+      return res
         .status(HttpStatus.NO_CONTENT)
         .send(user_module_content.user_delete_success_message);
     });
@@ -255,7 +303,7 @@ export class UserController {
   /**
    * Function to create seller request based on the provided data
    * @param createSellerDto : SellerRequestDto
-   * @param response: Response
+   * @param res: Response
    */
   @Post('seller-request')
   @ApiTags('Seller Request')
@@ -276,18 +324,19 @@ export class UserController {
   })
   public async createSellerRequest(
     @Body() createSellerDto: SellerRequestDto,
-    @Res() response: Response,
+    @Res() res: Response,
   ): Promise<Response> {
     return this.userService
       .createSellerRequest(createSellerDto)
       .then(createSellerSuccess => {
         Logger.log(
           'Inside success function of seller request',
-          JSON.stringify(createSellerSuccess),
+          JSON.stringify(createSellerDto),
         );
-        return response.status(HttpStatus.CREATED).send({
+        return res.status(HttpStatus.CREATED).send({
           success: true,
           message: user_module_content.seller_create_success_message,
+          _id: createSellerSuccess['id'],
         });
       });
   }
@@ -296,6 +345,7 @@ export class UserController {
    * Function to update seller request based on the userId
    * @param updateSellerDto : SellerRequestDto
    * @param reqId: string
+   * @param res: Response
    */
   @Put('seller-request/:reqId')
   @ApiTags('Seller Request')
@@ -316,13 +366,20 @@ export class UserController {
   public async updateSellerRequest(
     @Body() updateSellerDto: SellerRequestDto,
     @Param('reqId') reqId: string,
-  ): Promise<ISellerRequest> {
-    return this.userService.updateSellerRequest(updateSellerDto, reqId);
+    @Res() res: Response,
+  ): Promise<any> {
+    updateSellerDto.date_updated = new Date().getTime();
+    this.userService.updateSellerRequest(updateSellerDto, reqId).then(() => {
+      res.send({
+        _id: reqId,
+        ...updateSellerDto,
+      });
+    });
   }
 
   /**
    * Function to get all seller request
-   *
+   * @param res: Response
    */
   @Get('seller-requests')
   @ApiTags('Seller Request')
@@ -340,13 +397,23 @@ export class UserController {
     status: HttpStatus.FORBIDDEN,
     description: 'Forbidden',
   })
-  public async getAllRequest(): Promise<ISellerRequest[]> {
-    return this.userService.getAllRequest();
+  public async getAllRequest(@Res() res: Response): Promise<any> {
+    this.userService.getAllRequest().then(allRequest => {
+      const sellerRequestResult = processResponse(
+        allRequest,
+      ) as ISellerRequest[];
+      Logger.log(
+        user_module_content.get_users_request_success_message,
+        JSON.stringify(sellerRequestResult),
+      );
+      res.send(sellerRequestResult);
+    });
   }
 
   /**
    * Function to get seller request by Id
    * @param reqId: string
+   * @param res: Response
    */
   @Get('seller-request/:reqId')
   @ApiTags('Seller Request')
@@ -366,14 +433,20 @@ export class UserController {
   })
   public async getSellerRequest(
     @Param('reqId') reqId: string,
-  ): Promise<ISellerRequest> {
-    return this.userService.getSellerRequest(reqId);
+    @Res() res: Response,
+  ): Promise<any> {
+    this.userService.getSellerRequest(reqId).then(sellerRq => {
+      res.send({
+        _id: sellerRq.id,
+        ...sellerRq.data(),
+      });
+    });
   }
 
   /**
    * Function to delete seller request by Id
    * @param reqId: string
-   * @param response: Response
+   * @param res: Response
    */
   @Delete('seller-request/:reqId')
   @ApiTags('Seller Request')
@@ -392,19 +465,17 @@ export class UserController {
     description: 'Forbidden',
   })
   public async deleteSellerRequest(
-    @Param('reqId') reqId: string,
-    @Res() response: Response,
+    @Param('reqId') sellerReqId: string,
+    @Res() res: Response,
   ): Promise<Response> {
-    return this.userService
-      .deleteSellerRequest(reqId)
-      .then(deleteSellerResponse => {
-        Logger.log(
-          user_module_content.seller_delete_success_message,
-          JSON.stringify(deleteSellerResponse),
-        );
-        return response
-          .status(HttpStatus.NO_CONTENT)
-          .send(user_module_content.seller_delete_success_message);
-      });
+    return this.userService.deleteSellerRequest(sellerReqId).then(() => {
+      Logger.log(
+        user_module_content.seller_delete_success_message,
+        JSON.stringify(sellerReqId),
+      );
+      return res
+        .status(HttpStatus.NO_CONTENT)
+        .send(user_module_content.seller_delete_success_message);
+    });
   }
 }

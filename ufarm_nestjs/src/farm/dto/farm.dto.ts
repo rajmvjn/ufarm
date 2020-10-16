@@ -4,10 +4,6 @@ import { IsNotEmpty, IsString, IsOptional, IsDefined } from 'class-validator';
 
 export class FarmDto {
   @ApiProperty()
-  @IsOptional()
-  readonly farm_id: string;
-
-  @ApiProperty()
   @IsNotEmpty()
   @IsDefined()
   @IsString()
@@ -60,4 +56,12 @@ export class FarmDto {
   @ApiProperty()
   @IsOptional()
   readonly allowed_price_diff: number;
+
+  @ApiProperty()
+  @IsOptional()
+  date_created: any;
+
+  @ApiProperty()
+  @IsOptional()
+  date_updated: any;
 }

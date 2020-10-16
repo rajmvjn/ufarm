@@ -1,23 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-
-import { Model } from 'mongoose';
 
 import { ICategory } from './interfaces/category.interface';
 import { CategoryDto } from './dto/category-dto';
+import { FirestoreService } from '../firestore/firestore.service';
+import * as admin from 'firebase-admin';
 
 @Injectable()
 export class CategoryService {
-  constructor(
-    @InjectModel('Category') private readonly categoryModel: Model<ICategory>,
-  ) {}
+  private categoryCollection: any;
+  constructor(private readonly firestoreService: FirestoreService) {
+    this.categoryCollection = admin.firestore().collection('category');
+  }
 
   /**
    * Function to return the list of category
    */
   public async getAllCategory(): Promise<ICategory[]> {
     Logger.log('Inside get all category service');
-    return await this.categoryModel.find().exec();
+    return await this.categoryCollection.get();
   }
 
   /**
@@ -26,8 +26,7 @@ export class CategoryService {
    */
   public async createCategory(categoryReq: CategoryDto): Promise<ICategory> {
     Logger.log('Inside create category service', JSON.stringify(categoryReq));
-    const category = await this.categoryModel(categoryReq);
-    return category.save();
+    return await this.categoryCollection.add(Object.assign({}, categoryReq));
   }
 
   /**
@@ -43,18 +42,18 @@ export class CategoryService {
       `Inside get update category service: ${categoryId}`,
       JSON.stringify(categoryReq),
     );
-    return await this.categoryModel.findByIdAndUpdate(categoryId, categoryReq, {
-      new: true,
-    });
+    return await this.categoryCollection
+      .doc(categoryId)
+      .update(Object.assign({}, categoryReq));
   }
 
   /**
    * Function to get category based on the provided category Id
    * @param categoryId: string
    */
-  public async getCategory(categoryId: string): Promise<ICategory[]> {
+  public async getCategory(categoryId: string): Promise<ICategory> {
     Logger.log(`Inside get category by id service: ${categoryId}`);
-    return await this.categoryModel.findById(categoryId).exec();
+    return await this.categoryCollection.doc(categoryId).get();
   }
 
   /**
@@ -63,6 +62,6 @@ export class CategoryService {
    */
   public async deleteCategory(categoryId: string): Promise<string> {
     Logger.log(`Inside delete category by id service: ${categoryId}`);
-    return await this.categoryModel.findByIdAndRemove(categoryId).exec();
+    return await this.categoryCollection.doc(categoryId).delete();
   }
 }

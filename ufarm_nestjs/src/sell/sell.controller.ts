@@ -21,6 +21,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { diskStorage, MulterFile } from 'multer';
+
 import { Response } from 'express';
 
 import { SellService } from './sell.service';
@@ -28,6 +29,7 @@ import { SellDto } from './dto/sell-dto';
 import { ISell } from './interfaces/sell.interface';
 import { sell_module_content } from './sell-module-content';
 import { constants } from '../constants';
+import { processResponse } from 'src/shared/utils/util';
 import {
   imageFileFilter,
   editFileName,
@@ -47,7 +49,6 @@ export class SellController {
    */
   @Post('sell')
   @ApiOperation({ summary: 'Create sell product based on the provided data' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: constants.created })
   @UseInterceptors(
     FileInterceptor('sell_image', {
       storage: diskStorage({
@@ -59,6 +60,19 @@ export class SellController {
   )
   @ApiConsumes('multipart/form-data')
   @ApiSellProduct('sell_image')
+  @ApiResponse({ status: HttpStatus.CREATED, description: constants.created })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden',
+  })
   public async createItem(
     @Body() createSellDto: SellDto,
     @Res() response: Response,
@@ -70,12 +84,12 @@ export class SellController {
       .then(createSellResponse => {
         Logger.log(
           sell_module_content.sell_add_success_message,
-          JSON.stringify(createSellResponse),
+          JSON.stringify(createSellDto),
         );
         return response.status(HttpStatus.CREATED).send({
           success: true,
           message: sell_module_content.sell_add_success_message,
-          _id: createSellResponse['_id'],
+          _id: createSellResponse['id'],
           image_url: createSellResponse.image_url,
         });
       });
@@ -85,6 +99,7 @@ export class SellController {
    * Function to update sell prouduct based on the itemId
    * @param updateSellDto : SellDto
    * @param itemId: string
+   * @param res: Response
    * @param sellImage: MulterFile
    */
   @Put('sell/:itemId')
@@ -117,16 +132,22 @@ export class SellController {
     @Body() updateSellDto: SellDto,
     @Param('itemId') itemId: string,
     @UploadedFile() sellImage: MulterFile,
-  ): Promise<ISell> {
+    @Res() res: Response,
+  ): Promise<any> {
     if (sellImage) {
       updateSellDto.image_url = sellImage.filename;
     }
-    return this.sellService.updateItem(updateSellDto, itemId);
+    return this.sellService.updateItem(updateSellDto, itemId).then(() => {
+      res.send({
+        _id: itemId,
+        ...updateSellDto,
+      });
+    });
   }
 
   /**
    * Function to get all items
-   *
+   * @param res: Response
    */
   @Get('sell')
   @ApiOperation({ summary: 'Get all items' })
@@ -143,13 +164,21 @@ export class SellController {
     description: 'Forbidden',
   })
   @ApiResponse({ status: HttpStatus.OK, type: SellDto })
-  public async getAll(): Promise<ISell[]> {
-    return this.sellService.getAllItems();
+  public async getAll(@Res() res: Response): Promise<any> {
+    return this.sellService.getAllItems().then(itemsData => {
+      const itemsResult = processResponse(itemsData) as ISell[];
+      Logger.log(
+        sell_module_content.get_all_sell_items_success_message,
+        JSON.stringify(itemsResult),
+      );
+      res.send(itemsResult);
+    });
   }
 
   /**
    * Function to get item by Id
    * @param itemId: string
+   * @param res: Response
    */
   @Get('sell/:itemId')
   @ApiOperation({ summary: 'Get item by Id' })
@@ -166,8 +195,16 @@ export class SellController {
     status: HttpStatus.FORBIDDEN,
     description: 'Forbidden',
   })
-  public async getSell(@Param('itemId') itemId: string): Promise<ISell> {
-    return this.sellService.getItem(itemId);
+  public async getSell(
+    @Param('itemId') itemId: string,
+    @Res() res: Response,
+  ): Promise<any> {
+    return this.sellService.getItem(itemId).then(getItemData => {
+      res.send({
+        _id: getItemData.id,
+        ...getItemData.data(),
+      });
+    });
   }
 
   /**
@@ -197,10 +234,10 @@ export class SellController {
     @Param('itemId') itemId: string,
     @Res() response: Response,
   ): Promise<Response> {
-    return this.sellService.deleteItem(itemId).then(frmRqDeleteResponse => {
+    return this.sellService.deleteItem(itemId).then(() => {
       Logger.log(
         sell_module_content.sell_add_success_message,
-        JSON.stringify(frmRqDeleteResponse),
+        JSON.stringify(itemId),
       );
       return response.status(HttpStatus.NO_CONTENT).send({
         success: true,
@@ -211,7 +248,7 @@ export class SellController {
 
   /**
    * Function to get sell item based on the seller id
-   *
+   * @param res: Response
    */
   @Get('sell-items/:sellerId')
   @ApiOperation({ summary: 'Get Seller items' })
@@ -230,13 +267,17 @@ export class SellController {
   })
   public async getSellerItems(
     @Param('sellerId') sellerId: string,
-  ): Promise<ISell[]> {
-    return this.sellService.getSellerItems(sellerId);
+    @Res() res: Response,
+  ): Promise<any> {
+    return this.sellService.getSellerItems(sellerId).then(sellerItemData => {
+      const sellerItemResult = processResponse(sellerItemData) as ISell[];
+      res.send(sellerItemResult);
+    });
   }
 
   /**
    * Function to get buy items other than seller item
-   *
+   * @param res: Response
    */
   @Get('buy-items/:sellerId')
   @ApiOperation({ summary: 'Get Buyer items' })
@@ -255,7 +296,11 @@ export class SellController {
   })
   public async getBuyerItems(
     @Param('sellerId') sellerId: string,
-  ): Promise<ISell[]> {
-    return this.sellService.getBuyerItems(sellerId);
+    @Res() res: Response,
+  ): Promise<any> {
+    return this.sellService.getBuyerItems(sellerId).then(buyerItemData => {
+      const buyerItemResult = processResponse(buyerItemData) as ISell[];
+      res.send(buyerItemResult);
+    });
   }
 }
