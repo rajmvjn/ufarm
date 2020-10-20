@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 
@@ -12,7 +11,8 @@ import { AppController } from './app.controller';
 import { UserModule } from './user/user.module';
 import { SellModule } from './sell/sell.module';
 import { CartModule } from './cart/cart.module';
-import config from './config/configuration';
+import { AppService } from './app.service';
+
 import { FirestoreService } from './firestore/firestore.service';
 
 @Module({
@@ -33,9 +33,6 @@ import { FirestoreService } from './firestore/firestore.service';
           .valid('development', 'production', 'test')
           .default('development'),
         PORT: Joi.number().default(3000),
-        MONGO_DB_PASSWORD: Joi.string(),
-        MONGO_DB_NAME: Joi.string(),
-        MONGO_DB_USER_NAME: Joi.string(),
       }),
       validationOptions: {
         allowUnknown: true,
@@ -43,10 +40,7 @@ import { FirestoreService } from './firestore/firestore.service';
       },
     }),
     CartModule,
-    MongooseModule.forRoot(config().database.MONGO_DB_URI, {
-      useNewUrlParser: true,
-    }),
   ],
-  providers: [FirestoreService],
+  providers: [FirestoreService, AppService],
 })
 export class AppModule {}

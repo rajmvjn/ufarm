@@ -20,9 +20,11 @@ import {
   ApiConsumes,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
 
 import { Response } from 'express';
-import { diskStorage, MulterFile } from 'multer';
+import { MulterFile } from 'multer';
+import * as admin from 'firebase-admin';
 
 import { UserService } from './user.service';
 import { UserDto, AuthUserDto } from './dto/user-dto';
@@ -33,15 +35,23 @@ import { constants } from '../constants';
 import {
   imageFileFilter,
   editFileName,
+  uploadImageToStorage,
 } from '../shared/utils/file-upload.util';
 import { processResponse } from '../shared/utils/util';
 import { ApiUser } from './decorators/user-decorator';
 import { ISellerRequest } from './interfaces/seller-request.interface';
+import * as config from '../config/configuration';
 
 @Controller('v1')
 export class UserController {
   public users: IUser[] = [];
-  constructor(private readonly userService: UserService) {}
+  private storageBucket: any;
+  constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService,
+  ) {
+    this.storageBucket = admin.storage().bucket();
+  }
 
   /**
    * Function to create new user based on the provided data
@@ -54,11 +64,10 @@ export class UserController {
   @ApiOperation({ summary: 'Create user' })
   @UseInterceptors(
     FileInterceptor('profile_image', {
-      storage: diskStorage({
-        destination: `./${constants.IMAGE_FOLDER}`,
-        filename: editFileName,
-      }),
       fileFilter: imageFileFilter,
+      limits: {
+        fileSize: config.default().UPLOAD_LIMIT_MB * 1024 * 1024, // Allowed file upload size is 5mb can be configurable
+      },
     }),
   )
   @ApiConsumes('multipart/form-data')
@@ -76,12 +85,16 @@ export class UserController {
     status: HttpStatus.FORBIDDEN,
     description: 'Forbidden',
   })
-  public async createUser(
+  public createUser(
     @Body() createUserDto: UserDto,
     @UploadedFile() profileImage: MulterFile,
     @Res() res: Response,
-  ): Promise<Response> {
+  ): any {
+    // Image upload to firebase store
+    profileImage.filename = editFileName(profileImage);
     createUserDto.avatar = profileImage.filename;
+    uploadImageToStorage(profileImage, this.storageBucket);
+
     return this.userService
       .createUser(createUserDto)
       .then(createUserResponse => {
@@ -110,11 +123,10 @@ export class UserController {
   @ApiOperation({ summary: 'Update user based on user id' })
   @UseInterceptors(
     FileInterceptor('profile_image', {
-      storage: diskStorage({
-        destination: `./${constants.IMAGE_FOLDER}`,
-        filename: editFileName,
-      }),
       fileFilter: imageFileFilter,
+      limits: {
+        fileSize: config.default().UPLOAD_LIMIT_MB * 1024 * 1024, // Allowed file upload size is 5mb can be configurable
+      },
     }),
   )
   @ApiConsumes('multipart/form-data')
@@ -139,7 +151,10 @@ export class UserController {
     @Res() res: Response,
   ): Promise<any> {
     if (profileImage) {
+      // Image upload to firebase store
+      profileImage.filename = editFileName(profileImage);
       updateUserDto.avatar = profileImage.filename;
+      uploadImageToStorage(profileImage, this.storageBucket);
     }
     this.userService.updateUser(updateUserDto, userId).then(() => {
       res.send({
