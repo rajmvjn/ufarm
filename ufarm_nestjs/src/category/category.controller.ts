@@ -20,8 +20,9 @@ import {
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import { diskStorage, MulterFile } from 'multer';
+import { MulterFile } from 'multer';
 import { Response } from 'express';
+import * as admin from 'firebase-admin';
 
 import { CategoryService } from './category.service';
 import { CategoryDto } from './dto/category-dto';
@@ -30,18 +31,23 @@ import { constants } from '../constants';
 import {
   imageFileFilter,
   editFileName,
+  uploadImageToStorage,
 } from '../shared/utils/file-upload.util';
 import { ApiCategory } from './decorators/category-decorator';
 import { processResponse } from 'src/shared/utils/util';
 import { FirestoreService } from '../firestore/firestore.service';
+import * as config from '../config/configuration';
 
 @Controller('v1')
 @ApiTags('Category')
 export class CategoryController {
+  private storageBucket: any;
   constructor(
     private readonly categoryService: CategoryService,
     private readonly firestoreService: FirestoreService,
-  ) {}
+  ) {
+    this.storageBucket = admin.storage().bucket();
+  }
 
   /**
    * Function to create new category based on the provided data
@@ -53,11 +59,10 @@ export class CategoryController {
   @ApiOperation({ summary: 'Create category' })
   @UseInterceptors(
     FileInterceptor('category_image', {
-      storage: diskStorage({
-        destination: `./${constants.IMAGE_FOLDER}`,
-        filename: editFileName,
-      }),
       fileFilter: imageFileFilter,
+      limits: {
+        fileSize: config.default().UPLOAD_LIMIT_MB * 1024 * 1024, // Allowed file upload size is 5mb can be configurable
+      },
     }),
   )
   @ApiConsumes('multipart/form-data')
@@ -83,6 +88,11 @@ export class CategoryController {
     @Res() response: Response,
   ): Promise<Response> {
     createCategoryDto.image_url = catImage.filename;
+    // Image upload to firebase store
+    catImage.filename = editFileName(catImage);
+    createCategoryDto.image_url = catImage.filename;
+    uploadImageToStorage(catImage, this.storageBucket);
+
     return this.categoryService
       .createCategory(createCategoryDto)
       .then(catCreateResponse => {
@@ -108,11 +118,10 @@ export class CategoryController {
   @Put('category/:categoryId')
   @UseInterceptors(
     FileInterceptor('category_image', {
-      storage: diskStorage({
-        destination: `./${constants.IMAGE_FOLDER}`,
-        filename: editFileName,
-      }),
       fileFilter: imageFileFilter,
+      limits: {
+        fileSize: config.default().UPLOAD_LIMIT_MB * 1024 * 1024, // Allowed file upload size is 5mb can be configurable
+      },
     }),
   )
   @ApiConsumes('multipart/form-data')
@@ -138,7 +147,9 @@ export class CategoryController {
     @Res() res: Response,
   ): Promise<any> {
     if (catImage) {
+      catImage.filename = editFileName(catImage);
       updateCategoryDto.image_url = catImage.filename;
+      uploadImageToStorage(catImage, this.storageBucket);
     }
     updateCategoryDto.date_updated = this.firestoreService.timestamp();
     return this.categoryService

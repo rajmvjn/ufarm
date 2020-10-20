@@ -23,6 +23,7 @@ export class FirestoreService {
         .initializeApp({
           credential: firebase.credential.cert(adminConfig),
           databaseURL: this.configService.get<string>('FIREBASE_DATABASE_URL'),
+          storageBucket: 'ufarm-service.appspot.com',
         })
         .firestore();
     }

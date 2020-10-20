@@ -20,4 +20,7 @@ export default (): any => ({
     'firebase-adminsdk-6b9i4@ufarm-service.iam.gserviceaccount.com',
   FIREBASE_DATABASE_URL:
     process.env.FIREBASE_DATABASE_URL || 'https://ufarm-service.firebaseio.com',
+  FIREBASE_STORAGE_URL:
+    process.env.FIREBASE_STORAGE_URL || 'https://storage.googleapis.com',
+  UPLOAD_LIMIT_MB: process.env.UPLOAD_LIMIT_MB || 5,
 });

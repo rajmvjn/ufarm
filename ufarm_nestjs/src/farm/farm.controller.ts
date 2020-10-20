@@ -21,8 +21,8 @@ import {
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import { diskStorage, MulterFile } from 'multer';
-
+import { MulterFile } from 'multer';
+import * as admin from 'firebase-admin';
 import { Response } from 'express';
 
 import { FarmService } from './farm.service';
@@ -33,17 +33,22 @@ import { constants } from '../constants';
 import {
   imageFileFilter,
   editFileName,
+  uploadImageToStorage,
 } from '../shared/utils/file-upload.util';
 import { ApiFarmProduct } from './decorators/farm-product.decorator';
 import { FirestoreService } from '../firestore/firestore.service';
-import { processResponse } from 'src/shared/utils/util';
+import { processResponse } from '../shared/utils/util';
+import * as config from '../config/configuration';
 
 @Controller('v1')
 export class FarmController {
+  private storageBucket: any;
   constructor(
     private readonly farmService: FarmService,
     private readonly firestoreService: FirestoreService,
-  ) {}
+  ) {
+    this.storageBucket = admin.storage().bucket();
+  }
 
   /**
    * Function to create new farm request based on the provided data
@@ -56,11 +61,10 @@ export class FarmController {
   @ApiOperation({ summary: 'Create Farm product' })
   @UseInterceptors(
     FileInterceptor('product_image', {
-      storage: diskStorage({
-        destination: './images',
-        filename: editFileName,
-      }),
       fileFilter: imageFileFilter,
+      limits: {
+        fileSize: config.default().UPLOAD_LIMIT_MB * 1024 * 1024, // Allowed file upload size is 5mb can be configurable
+      },
     }),
   )
   @ApiConsumes('multipart/form-data')
@@ -83,7 +87,10 @@ export class FarmController {
     @UploadedFile() productImage: MulterFile,
     @Res() response: Response,
   ): Promise<Response> {
+    // Image upload to firebase store
+    productImage.filename = editFileName(productImage);
     createFarmProductDto.image_url = productImage.filename;
+    uploadImageToStorage(productImage, this.storageBucket);
     return this.farmService
       .createFarmProduct(createFarmProductDto)
       .then(frmRqCreateResponse => {
@@ -111,11 +118,10 @@ export class FarmController {
   @ApiTags('Farm')
   @UseInterceptors(
     FileInterceptor('product_image', {
-      storage: diskStorage({
-        destination: './images',
-        filename: editFileName,
-      }),
       fileFilter: imageFileFilter,
+      limits: {
+        fileSize: config.default().UPLOAD_LIMIT_MB * 1024 * 1024, // Allowed file upload size is 5mb can be configurable
+      },
     }),
   )
   @ApiConsumes('multipart/form-data')
@@ -141,7 +147,10 @@ export class FarmController {
     @Res() res: Response,
   ): Promise<any> {
     if (productImage) {
+      // Image upload to firebase store
+      productImage.filename = editFileName(productImage);
       updateFarmProductDto.image_url = productImage.filename;
+      uploadImageToStorage(productImage, this.storageBucket);
     }
     updateFarmProductDto.date_updated = this.firestoreService.timestamp();
     return this.farmService

@@ -20,8 +20,8 @@ import {
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import { diskStorage, MulterFile } from 'multer';
-
+import { MulterFile } from 'multer';
+import * as admin from 'firebase-admin';
 import { Response } from 'express';
 
 import { SellService } from './sell.service';
@@ -33,13 +33,18 @@ import { processResponse } from 'src/shared/utils/util';
 import {
   imageFileFilter,
   editFileName,
+  uploadImageToStorage,
 } from '../shared/utils/file-upload.util';
 import { ApiSellProduct } from './decorators/sell.decorator';
+import * as config from '../config/configuration';
 
 @Controller('v1')
 @ApiTags('Items')
 export class SellController {
-  constructor(private readonly sellService: SellService) {}
+  private storageBucket: any;
+  constructor(private readonly sellService: SellService) {
+    this.storageBucket = admin.storage().bucket();
+  }
 
   /**
    * Function to create new sell item based on the provided data
@@ -51,11 +56,10 @@ export class SellController {
   @ApiOperation({ summary: 'Create sell product based on the provided data' })
   @UseInterceptors(
     FileInterceptor('sell_image', {
-      storage: diskStorage({
-        destination: './images',
-        filename: editFileName,
-      }),
       fileFilter: imageFileFilter,
+      limits: {
+        fileSize: config.default().UPLOAD_LIMIT_MB * 1024 * 1024, // Allowed file upload size is 5mb can be configurable
+      },
     }),
   )
   @ApiConsumes('multipart/form-data')
@@ -78,7 +82,10 @@ export class SellController {
     @Res() response: Response,
     @UploadedFile() sellImage: MulterFile,
   ): Promise<Response> {
+    // Image upload to firebase store
+    sellImage.filename = editFileName(sellImage);
     createSellDto.image_url = sellImage && sellImage.filename;
+    uploadImageToStorage(sellImage, this.storageBucket);
     return this.sellService
       .createItem(createSellDto)
       .then(createSellResponse => {
@@ -119,11 +126,10 @@ export class SellController {
   @ApiResponse({ status: HttpStatus.OK, type: SellDto })
   @UseInterceptors(
     FileInterceptor('sell_image', {
-      storage: diskStorage({
-        destination: './images',
-        filename: editFileName,
-      }),
       fileFilter: imageFileFilter,
+      limits: {
+        fileSize: config.default().UPLOAD_LIMIT_MB * 1024 * 1024, // Allowed file upload size is 5mb can be configurable
+      },
     }),
   )
   @ApiConsumes('multipart/form-data')
@@ -135,7 +141,9 @@ export class SellController {
     @Res() res: Response,
   ): Promise<any> {
     if (sellImage) {
-      updateSellDto.image_url = sellImage.filename;
+      sellImage.filename = editFileName(sellImage);
+      updateSellDto.image_url = sellImage && sellImage.filename;
+      uploadImageToStorage(sellImage, this.storageBucket);
     }
     return this.sellService.updateItem(updateSellDto, itemId).then(() => {
       res.send({
