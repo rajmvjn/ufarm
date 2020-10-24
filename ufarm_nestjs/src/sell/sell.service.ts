@@ -63,6 +63,7 @@ export class SellService {
 
   /**
    * Function to return the list of seller items
+   * @param sellerId: string
    */
   public async getSellerItems(sellerId: string): Promise<ISell[]> {
     Logger.log('Inside get Seller items service', sellerId);
@@ -71,6 +72,7 @@ export class SellService {
 
   /**
    * Function to return the list of buyer items
+   * @param sellerId: string
    */
   public async getBuyerItems(sellerId: string): Promise<ISell[]> {
     Logger.log('Inside get Buyer items service', sellerId);

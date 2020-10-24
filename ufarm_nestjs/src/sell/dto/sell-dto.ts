@@ -1,13 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import {
-  IsString,
-  IsBoolean,
-  IsOptional,
-  IsDefined,
-  IsNumber,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsString, IsOptional, IsDefined, IsNotEmpty } from 'class-validator';
 
 export class SellDto {
   @ApiProperty()
@@ -33,7 +26,6 @@ export class SellDto {
   readonly description: string;
 
   @ApiProperty()
-  @IsNumber()
   readonly quantity_available: number;
 
   @ApiProperty()
@@ -49,7 +41,6 @@ export class SellDto {
   readonly sell_user_id: string;
 
   @ApiProperty()
-  @IsBoolean()
   readonly status: boolean;
 
   @ApiProperty()
@@ -58,7 +49,7 @@ export class SellDto {
 
   @ApiProperty()
   @IsOptional()
-  readonly image_url: string;
+  image_url: string;
 
   @ApiProperty()
   @IsOptional()

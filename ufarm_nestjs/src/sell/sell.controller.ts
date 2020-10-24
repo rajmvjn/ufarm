@@ -9,9 +9,18 @@ import {
   Res,
   HttpStatus,
   Logger,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiConsumes,
+} from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
+import { diskStorage, MulterFile } from 'multer';
 import { Response } from 'express';
 
 import { SellService } from './sell.service';
@@ -19,6 +28,11 @@ import { SellDto } from './dto/sell-dto';
 import { ISell } from './interfaces/sell.interface';
 import { sell_module_content } from './sell-module-content';
 import { constants } from '../constants';
+import {
+  editFileName,
+  imageFileFilter,
+} from '../shared/utils/file-upload.util';
+import { ApiSellProduct } from './decorators/sell.decorator';
 
 @Controller('v1')
 @ApiTags('Items')
@@ -28,10 +42,22 @@ export class SellController {
   /**
    * Function to create new sell item based on the provided data
    * @param createSellDto : SellDto
+   * @param file: MulterFile
    * @param response: Response
    */
   @Post('sell')
   @ApiOperation({ summary: 'Create sell product based on the provided data' })
+  @UseInterceptors(
+    FileInterceptor('sell_image', {
+      storage: diskStorage({
+        destination: `./${constants.IMAGE_FOLDER}`,
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiSellProduct('sell_image')
   @ApiResponse({ status: HttpStatus.CREATED, description: constants.created })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -47,8 +73,10 @@ export class SellController {
   })
   public async createItem(
     @Body() createSellDto: SellDto,
+    @UploadedFile() sellImage: MulterFile,
     @Res() response: Response,
   ): Promise<Response> {
+    createSellDto.image_url = sellImage.filename;
     return this.sellService
       .createItem(createSellDto)
       .then(createSellResponse => {
@@ -68,10 +96,22 @@ export class SellController {
   /**
    * Function to update sell prouduct based on the itemId
    * @param updateSellDto : SellDto
+   * @param file: MulterFile
    * @param itemId: string
    */
   @Put('sell/:itemId')
   @ApiOperation({ summary: 'Update sell item based on item id' })
+  @UseInterceptors(
+    FileInterceptor('sell_image', {
+      storage: diskStorage({
+        destination: `./${constants.IMAGE_FOLDER}`,
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiSellProduct('sell_image')
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error',
@@ -87,8 +127,12 @@ export class SellController {
   @ApiResponse({ status: HttpStatus.OK, type: SellDto })
   public async updateSell(
     @Body() updateSellDto: SellDto,
+    @UploadedFile() sellImage: MulterFile,
     @Param('itemId') itemId: string,
   ): Promise<ISell> {
+    if (sellImage) {
+      updateSellDto.image_url = sellImage.filename;
+    }
     return this.sellService.updateItem(updateSellDto, itemId);
   }
 
